@@ -17,7 +17,7 @@
 mono_crash.*
 
 # Build results
-build/*
+build/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -378,7 +378,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # VS Code files for those working on multiple tools
-.vscode/*
+.vscode/
 # !.vscode/settings.json
 # !.vscode/tasks.json
 # !.vscode/launch.json
