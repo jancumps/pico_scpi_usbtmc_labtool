@@ -59,7 +59,8 @@ int main(void)
 
   scpi_instrument_init();
 
-  tusb_init();
+    // init device stack on configured roothub port
+  tud_init(BOARD_TUD_RHPORT);
 
   while (1)
   {
