@@ -51,7 +51,12 @@
 #include "scpi-def.h"
 
 #include "gpio_utils.h"
+#include "adc_utils.h"
+#include "pwm_utils.h"
+
 #include "usbtmc_app.h"
+
+void initInstrument();
 
 /**
  * Reimplement IEEE488.2 *TST?
@@ -147,7 +152,7 @@ scpi_t scpi_context;
 
 // init helper for this instrument
 void scpi_instrument_init() {
-    initOutPins(); // if you prefer no dependency on the gpio_utils in main,
+    initInstrument(); // if you prefer no dependency on the gpio_utils in main,
               // you could move this call into the scpi_instrument_init() body.
               // like I did here
     
@@ -179,6 +184,13 @@ size_t SCPI_Write(scpi_t * context, const char * data, size_t len) {
 
 scpi_result_t SCPI_Reset(scpi_t * context) {
     (void) context;
-    initOutPins();
+    initInstrument();
     return SCPI_RES_OK;   
+}
+
+void initInstrument() {
+    initOutPins();
+    // TODO input pins
+    initAdcPins();
+    initPwmPins();
 }
