@@ -3,6 +3,7 @@
 
 
 uint32_t outPinCount();
+void initGpioUtils();
 void initOutPins();
 void setOutPinAt(uint32_t index, bool on);
 bool isOutPinAt(uint32_t index);

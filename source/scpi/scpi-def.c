@@ -195,8 +195,12 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
 }
 
 void initInstrument() {
+    initGpioUtils();
     initOutPins();
     // TODO input pins
+
+    initAdcUtils();
     initAdcPins();
+    initPwmUtils();
     initPwmPins();
 }

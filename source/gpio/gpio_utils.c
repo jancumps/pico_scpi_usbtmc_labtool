@@ -11,6 +11,10 @@ uint outPins[] = {
 
 // TODO input pins
 
+void initGpioUtils() {
+    return; // nothing needed
+}
+
 uint32_t outPinCount() {
     return sizeof(outPins)/sizeof(outPins[0]);
 }
