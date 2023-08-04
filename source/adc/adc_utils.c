@@ -4,13 +4,16 @@
 
 /*
 ADC0	GP26
-ADC1	GP27
+ADC1	GP27 // used fore button on the pico-eurocard
 ADC2	GP28
 */
 
 // supported pins
 uint adcPins[][2] = {
-    {0,26}, {1,27}, {2,28}};
+    {0,26}, 
+    // {1,27}, // this is used for the button on the eurocard.
+    {2,28}
+};
 
 void initAdcUtils() {
     adc_init();
