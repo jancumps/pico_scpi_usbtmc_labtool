@@ -109,7 +109,21 @@ static scpi_result_t SCPI_DigitalOutputQ(scpi_t * context) {
 }
 
 // TODO gpio in commands
-// TODO adc commands
+
+static scpi_result_t SCPI_AnalogInputQ(scpi_t * context) {
+  int32_t numbers[1];
+
+  // retrieve the adc index
+  SCPI_CommandNumbers(context, numbers, 1, 0);
+  if (! ((numbers[0] > -1) && (numbers[0] < adcPinCount()))) {
+    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+    return SCPI_RES_ERR;
+  }
+
+  SCPI_ResultUInt16(context, getAdcPinAt(numbers[0]));
+  return SCPI_RES_OK;
+}
+
 // TODO pwm in commands
 
 const scpi_command_t scpi_commands[] = {
@@ -138,6 +152,7 @@ const scpi_command_t scpi_commands[] = {
     {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
     // TODO gpio in commands
     // TODO adc commands
+    {.pattern = "ANAlog:INPut#:RAW?", .callback = SCPI_AnalogInputQ,},
     // TODO pwm in commands
     SCPI_CMD_LIST_END
 };
@@ -195,8 +210,11 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
 }
 
 void initInstrument() {
+    initGpioUtils();
     initOutPins();
     // TODO input pins
+    initAdcUtils();
     initAdcPins();
+    initPwmUtils();
     initPwmPins();
 }

@@ -2,6 +2,10 @@
 
 #include "pwm_utils.h"
 
+void initPwmUtils() {
+    // TODO pwm_init();
+}
+
 uint32_t pwmPinCount() {
     // TODO implement
     return 0;
