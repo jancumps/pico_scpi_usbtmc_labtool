@@ -7,4 +7,6 @@ void initOutPins();
 void setOutPinAt(uint32_t index, bool on);
 bool isOutPinAt(uint32_t index);
 
+// TODO gpio input pins
+
 #endif // _GPIO_UTILS_H

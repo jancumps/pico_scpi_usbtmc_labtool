@@ -26,6 +26,8 @@ add_executable(pico_scpi_usbtmc_labtool
         ${CMAKE_CURRENT_SOURCE_DIR}/source/usb/usbtmc_app.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/scpi/scpi-def.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/gpio/gpio_utils.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/source/adc/adc_utils.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/source/pwm/pwm_utils.c
         $ENV{SCPI_LIB_PATH}/src/parser.c
         $ENV{SCPI_LIB_PATH}/src/lexer.c
         $ENV{SCPI_LIB_PATH}/src/error.c
@@ -41,10 +43,12 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/source/usb
         ${CMAKE_CURRENT_LIST_DIR}/source/scpi
         ${CMAKE_CURRENT_LIST_DIR}/source/gpio
+        ${CMAKE_CURRENT_LIST_DIR}/source/adc
+        ${CMAKE_CURRENT_LIST_DIR}/source/pwm
         $ENV{SCPI_LIB_PATH}/inc
 )
 
-target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board)
+target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_adc hardware_pwm)
 pico_add_extra_outputs(pico_scpi_usbtmc_labtool)
 
 # usb output, uart output

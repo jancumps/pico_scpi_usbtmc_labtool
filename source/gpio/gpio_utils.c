@@ -9,6 +9,7 @@ uint outPins[] = {
     if you want to use this pin, remove the led_blinking_task() */
     22, 14, 15};
 
+// TODO input pins
 
 uint32_t outPinCount() {
     return sizeof(outPins)/sizeof(outPins[0]);
@@ -30,3 +31,4 @@ bool isOutPinAt(uint32_t index) {
     return gpio_get_out_level(outPins[index]);
 }
 
+// TODO input pins

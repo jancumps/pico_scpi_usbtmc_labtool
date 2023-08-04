@@ -51,7 +51,12 @@
 #include "scpi-def.h"
 
 #include "gpio_utils.h"
+#include "adc_utils.h"
+#include "pwm_utils.h"
+
 #include "usbtmc_app.h"
+
+void initInstrument();
 
 /**
  * Reimplement IEEE488.2 *TST?
@@ -103,6 +108,9 @@ static scpi_result_t SCPI_DigitalOutputQ(scpi_t * context) {
   return SCPI_RES_OK;
 }
 
+// TODO gpio in commands
+// TODO adc commands
+// TODO pwm in commands
 
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
@@ -128,6 +136,9 @@ const scpi_command_t scpi_commands[] = {
     /* custom commands for the switch */
     {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
     {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
+    // TODO gpio in commands
+    // TODO adc commands
+    // TODO pwm in commands
     SCPI_CMD_LIST_END
 };
 
@@ -147,7 +158,7 @@ scpi_t scpi_context;
 
 // init helper for this instrument
 void scpi_instrument_init() {
-    initOutPins(); // if you prefer no dependency on the gpio_utils in main,
+    initInstrument(); // if you prefer no dependency on the gpio_utils in main,
               // you could move this call into the scpi_instrument_init() body.
               // like I did here
     
@@ -179,6 +190,13 @@ size_t SCPI_Write(scpi_t * context, const char * data, size_t len) {
 
 scpi_result_t SCPI_Reset(scpi_t * context) {
     (void) context;
-    initOutPins();
+    initInstrument();
     return SCPI_RES_OK;   
+}
+
+void initInstrument() {
+    initOutPins();
+    // TODO input pins
+    initAdcPins();
+    initPwmPins();
 }
