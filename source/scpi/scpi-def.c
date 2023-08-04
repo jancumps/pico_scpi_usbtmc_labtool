@@ -108,6 +108,9 @@ static scpi_result_t SCPI_DigitalOutputQ(scpi_t * context) {
   return SCPI_RES_OK;
 }
 
+// TODO gpio in commands
+// TODO adc commands
+// TODO pwm in commands
 
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
@@ -133,6 +136,9 @@ const scpi_command_t scpi_commands[] = {
     /* custom commands for the switch */
     {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
     {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
+    // TODO gpio in commands
+    // TODO adc commands
+    // TODO pwm in commands
     SCPI_CMD_LIST_END
 };
 
