@@ -4,7 +4,7 @@
 
 /*
 ADC0	GP26
-ADC1	GP27 // used fore button on the pico-eurocard
+ADC1	GP27 // used for button on the pico-eurocard
 ADC2	GP28
 */
 
