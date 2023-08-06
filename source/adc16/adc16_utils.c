@@ -8,6 +8,14 @@ ADC16 uses the I2C bus to communicate with the ASD1115 chip.
 The I2C bus is connected to the following pins:
 SCL: GP5
 SDA: GP4
+
+ ADC strategy:
+ The ADC is run in continuous-conversion mode. Currently only single-ended inputs are supported,
+ enumerated as channels 0-3. The ADC is configured to measure +2.048V full-scale, at a rate of 32 SPS,
+ i.e. a new result is available every 31.25ms. Note: when switching channels, the new result won't be
+ available for about 80 msec (2 * 31.25ms, plus a small margin).
+ In single-ended mode, the raw result is a 15-bit value, i.e. 0-32767.
+ To convert to a voltage, the reported raw result can be multiplied by 2.048/32767.
 */
 
 /************** global vars ***************/
@@ -91,6 +99,14 @@ uint16_t readAdc16Meas(void) {
     i2c_write_blocking(i2c_default, ADS_ADDR, buf8_ptr, 1, false);
     i2c_read_blocking(i2c_default, ADS_ADDR, buf8_ptr, 2, false);
     meas = buf>>8 | buf<<8; // swap bytes
+    if (adc16Channel < 4) {
+        // we are in single-ended mode. Any integer value less than 0 is invalid
+        // and since we are dealing with unsigned values, that means that any
+        // value greater than 32767 is invalid.
+        if (meas > 32767) {
+            meas = 0;
+        }
+    }
     return(meas);
 }
 
@@ -113,7 +129,7 @@ uint16_t getAdc16PinAt(uint32_t index) {
         adc16Channel = index;
         setAdc16Mux(ADS1115_CH0 + index);
         // no need to start conversion, since we are in continuous conversion mode
-        sleep_ms(150); // wait for conversion to complete
+        sleep_ms(80); // wait for conversion to complete. The value should be 2 * (1/SPS) + margin
     }
     res = readAdc16Meas();
     // no need to start another conversion, since we are in continuous conversion mode
