@@ -40,7 +40,7 @@ void initAdc16Reg(void) {
     }
     // set config register to desired values
     confreg[0] = 0x44; // MUX set to AIN0, and PGA set to +-2.048V and continuous conversion mode
-    confreg[1] = 0x03; // rate = 8 SPS
+    confreg[1] = 0x43; // rate = 32 SPS
     buf[0] = ADS1115_REG_CONFIG;
     buf[1] = confreg[0];
     buf[2] = confreg[1];
