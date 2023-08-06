@@ -52,6 +52,7 @@
 
 #include "gpio_utils.h"
 #include "adc_utils.h"
+#include "adc16_utils.h"
 #include "pwm_utils.h"
 
 #include "usbtmc_app.h"

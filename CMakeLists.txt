@@ -36,7 +36,7 @@ add_executable(pico_scpi_usbtmc_labtool
         $ENV{SCPI_LIB_PATH}/src/utils.c
         $ENV{SCPI_LIB_PATH}/src/units.c
         $ENV{SCPI_LIB_PATH}/src/fifo.c
-        )
+        source/adc16/adc16_utils.c source/adc16/adc16_utils.h)
 
 target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/source
@@ -48,7 +48,7 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
         $ENV{SCPI_LIB_PATH}/inc
 )
 
-target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm)
+target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c)
 pico_add_extra_outputs(pico_scpi_usbtmc_labtool)
 
 # usb output, uart output
