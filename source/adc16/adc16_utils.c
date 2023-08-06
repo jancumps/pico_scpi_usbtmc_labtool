@@ -12,7 +12,7 @@ SDA: GP4
 
 /************** global vars ***************/
 uint8_t adc16Installed = 0;
-uint8_t adc16Channel = 0;
+uint32_t adc16Channel = 0;
 uint8_t confreg[2]; // config register
 
 /************** functions *****************/
@@ -102,29 +102,13 @@ uint32_t adc16PinCount() {
 
 // get ADC result from the ADS1115
 uint16_t getAdc16PinAt(uint32_t index) {
-    uint8_t muxval;
     uint16_t res;
-    if (adc16Channel == (uint8_t)index) {
+    if (adc16Channel == index) {
         // already set to this channel
     } else {
         // switch channel, and then wait for a conversion to be done
-        switch (index) {
-            case 0:
-                muxval = ADS1115_CH0;
-                break;
-            case 1:
-                muxval = ADS1115_CH1;
-                break;
-            case 2:
-                muxval = ADS1115_CH2;
-                break;
-            case 3:
-                muxval = ADS1115_CH3;
-                break;
-            default:
-                break;
-        }
-        setAdc16Mux(muxval);
+        adc16Channel = index;
+        setAdc16Mux(ADS1115_CH0 + index);
         // no need to start conversion, since we are in continuous conversion mode
         sleep_ms(150); // wait for conversion to complete
     }
