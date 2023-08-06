@@ -57,7 +57,8 @@ void setAdc16Mux(uint8_t mux) {
     i2c_write_blocking(i2c_default, ADS_ADDR, buf, 3, false);
 }
 
-// start a conversion
+// start a conversion (this is only for single-shot mode)
+// will delete this function if it's not needed
 void startAdc16Conv(void) {
     uint8_t buf[3];
     buf[0] = ADS1115_REG_CONFIG;
@@ -66,7 +67,8 @@ void startAdc16Conv(void) {
     i2c_write_blocking(i2c_default, ADS_ADDR, buf, 3, false);
 }
 
-// check if the conversion is complete
+// check if the conversion is complete (this may only work for single-shot mode)
+// will delete this function if it's not needed
 uint8_t adc16ConvDone(void) {
     uint8_t buf[3];
     buf[0] = ADS1115_REG_CONFIG;
@@ -123,9 +125,10 @@ uint16_t getAdc16PinAt(uint32_t index) {
                 break;
         }
         setAdc16Mux(muxval);
-        startAdc16Conv();
+        // no need to start conversion, since we are in continuous conversion mode
         sleep_ms(150); // wait for conversion to complete
     }
     res = readAdc16Meas();
+    // no need to start another conversion, since we are in continuous conversion mode
     return(res);
 }
