@@ -84,12 +84,14 @@ uint8_t adc16ConvDone(void) {
 
 // read the conversion register
 uint16_t readAdc16Meas(void) {
+    uint16_t meas;
     uint16_t buf;
     uint8_t* buf8_ptr = (uint8_t*)&buf;
     *buf8_ptr = ADS1115_REG_CONVERSION;
-    i2c_write_blocking(i2c_default, ADS_ADDR, buf8_ptr, 1, true);
+    i2c_write_blocking(i2c_default, ADS_ADDR, buf8_ptr, 1, false);
     i2c_read_blocking(i2c_default, ADS_ADDR, buf8_ptr, 2, false);
-    return(buf);
+    meas = buf>>8 | buf<<8; // swap bytes
+    return(meas);
 }
 
 // provide a pin count. returns 0 if the ADS1115 is not installed
