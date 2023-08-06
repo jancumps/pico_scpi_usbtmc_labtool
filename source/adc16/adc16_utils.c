@@ -11,6 +11,8 @@ SDA: GP4
 */
 
 /************** global vars ***************/
+uint8_t adc16Installed = 0;
+uint8_t adc16Channel = 0;
 uint8_t confreg[2]; // config register
 
 /************** functions *****************/
@@ -26,12 +28,55 @@ void initAdc16I2C(void) {
 // initialize the ADS1115 registers
 void initAdc16Reg(void) {
     uint8_t buf[3];
-    confreg[0] = 0x44; // MUX set to AIN0, and PGA set to +-2.048V and Continuous Conversion mode
+    // is the ADC chip installed?
+    buf[0] = ADS1115_REG_CONFIG;
+    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 1, false);
+    i2c_read_blocking(i2c_default, ADS_ADDR, buf, 2, false);
+    if (buf[0] != 0x85 || buf[1] != 0x83) {
+        adc16Installed = 0; // no chip found
+        return;
+    } else {
+        adc16Installed = 1; // chip found
+    }
+    // set config register to desired values
+    confreg[0] = 0x44; // MUX set to AIN0, and PGA set to +-2.048V and continuous conversion mode
     confreg[1] = 0x03; // rate = 8 SPS
+    buf[1] = confreg[0];
+    buf[2] = confreg[1];
+    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 3, false);
+}
+
+// set the multiplexer to the desired input
+void setAdc16Mux(uint8_t mux) {
+    uint8_t buf[3];
+    confreg[0] &= ~0x70; // clear the MUX bits
+    confreg[0] |= (mux<<4); // set the MUX bits
     buf[0] = ADS1115_REG_CONFIG;
     buf[1] = confreg[0];
     buf[2] = confreg[1];
     i2c_write_blocking(i2c_default, ADS_ADDR, buf, 3, false);
+}
+
+// start a conversion
+void startAdc16Conv(void) {
+    uint8_t buf[3];
+    buf[0] = ADS1115_REG_CONFIG;
+    buf[1] = confreg[0] | 0x80; // set 'OS' bit to start a conversion
+    buf[2] = confreg[1];
+    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 3, false);
+}
+
+// check if the conversion is complete
+uint8_t adc16ConvDone(void) {
+    uint8_t buf[3];
+    buf[0] = ADS1115_REG_CONFIG;
+    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 1, false);
+    i2c_read_blocking(i2c_default, ADS_ADDR, buf, 2, false);
+    if (buf[0] & 0x80) {
+        return 0; // conversion not done
+    } else {
+        return 1; // conversion done
+    }
 }
 
 // read the conversion register
@@ -42,4 +87,45 @@ uint16_t readAdc16Meas(void) {
     i2c_write_blocking(i2c_default, ADS_ADDR, buf8_ptr, 1, true);
     i2c_read_blocking(i2c_default, ADS_ADDR, buf8_ptr, 2, false);
     return(buf);
+}
+
+// provide a pin count. returns 0 if the ADS1115 is not installed
+uint32_t adc16PinCount() {
+    if (adc16Installed) {
+        return(4);
+    } else {
+        return(0);
+    }
+}
+
+// get ADC result from the ADS1115
+uint16_t getAdc16PinAt(uint32_t index) {
+    uint8_t muxval;
+    uint16_t res;
+    if (adc16Channel == (uint8_t)index) {
+        // already set to this channel
+    } else {
+        // switch channel, and then wait for a conversion to be done
+        switch (index) {
+            case 0:
+                muxval = ADS1115_CH0;
+                break;
+            case 1:
+                muxval = ADS1115_CH1;
+                break;
+            case 2:
+                muxval = ADS1115_CH2;
+                break;
+            case 3:
+                muxval = ADS1115_CH3;
+                break;
+            default:
+                break;
+        }
+        setAdc16Mux(muxval);
+        startAdc16Conv();
+        sleep_ms(150); // wait for conversion to complete
+    }
+    res = readAdc16Meas();
+    return(res);
 }
