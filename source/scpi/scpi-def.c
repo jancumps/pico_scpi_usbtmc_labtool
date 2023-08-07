@@ -52,6 +52,7 @@
 
 #include "gpio_utils.h"
 #include "adc_utils.h"
+#include "adc16_utils.h"
 #include "pwm_utils.h"
 
 #include "usbtmc_app.h"
@@ -124,6 +125,20 @@ static scpi_result_t SCPI_AnalogInputQ(scpi_t * context) {
   return SCPI_RES_OK;
 }
 
+static scpi_result_t SCPI_Analog16InputQ(scpi_t * context) {
+    int32_t numbers[1];
+
+    // retrieve the adc index
+    SCPI_CommandNumbers(context, numbers, 1, 0);
+    if (! ((numbers[0] > -1) && (numbers[0] < adc16PinCount()))) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt16(context, getAdc16PinAt(numbers[0]));
+    return SCPI_RES_OK;
+}
+
 // TODO pwm in commands
 
 const scpi_command_t scpi_commands[] = {
@@ -153,6 +168,7 @@ const scpi_command_t scpi_commands[] = {
     // TODO gpio in commands
     // TODO adc commands
     {.pattern = "ANAlog:INPut#:RAW?", .callback = SCPI_AnalogInputQ,},
+    {.pattern = "ANAlog:HIRES:INPut#:RAW?", .callback = SCPI_Analog16InputQ,},
     // TODO pwm in commands
     SCPI_CMD_LIST_END
 };
@@ -215,6 +231,8 @@ void initInstrument() {
     // TODO input pins
     initAdcUtils();
     initAdcPins();
+    initAdc16I2C();
+    initAdc16Reg();
     initPwmUtils();
     initPwmPins();
 }
