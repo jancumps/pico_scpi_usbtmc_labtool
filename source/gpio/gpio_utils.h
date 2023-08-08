@@ -2,9 +2,12 @@
 #define _GPIO_UTILS_H
 
 
-uint32_t pinCount();
-void initPins();
-void setPinAt(uint32_t index, bool on);
-bool isPinAt(uint32_t index);
+uint32_t outPinCount();
+void initGpioUtils();
+void initOutPins();
+void setOutPinAt(uint32_t index, bool on);
+bool isOutPinAt(uint32_t index);
+
+// TODO gpio input pins
 
 #endif // _GPIO_UTILS_H

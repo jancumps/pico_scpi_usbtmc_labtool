@@ -51,7 +51,13 @@
 #include "scpi-def.h"
 
 #include "gpio_utils.h"
+#include "adc_utils.h"
+#include "adc16_utils.h"
+#include "pwm_utils.h"
+
 #include "usbtmc_app.h"
+
+void initInstrument();
 
 /**
  * Reimplement IEEE488.2 *TST?
@@ -74,7 +80,7 @@ static scpi_result_t SCPI_DigitalOutput(scpi_t * context) {
 
   // retrieve the output index
   SCPI_CommandNumbers(context, numbers, 1, 0);
-  if (! ((numbers[0] > -1) && (numbers[0] < pinCount()))) {
+  if (! ((numbers[0] > -1) && (numbers[0] < outPinCount()))) {
     SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
     return SCPI_RES_ERR;
   }
@@ -84,7 +90,7 @@ static scpi_result_t SCPI_DigitalOutput(scpi_t * context) {
     return SCPI_RES_ERR;
   }
 
-  setPinAt(numbers[0], param1 ? true : false);
+  setOutPinAt(numbers[0], param1 ? true : false);
 
   return SCPI_RES_OK;
 }
@@ -94,15 +100,46 @@ static scpi_result_t SCPI_DigitalOutputQ(scpi_t * context) {
 
   // retrieve the output index
   SCPI_CommandNumbers(context, numbers, 1, 0);
-  if (! ((numbers[0] > -1) && (numbers[0] < pinCount()))) {
+  if (! ((numbers[0] > -1) && (numbers[0] < outPinCount()))) {
     SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
     return SCPI_RES_ERR;
   }
 
-  SCPI_ResultBool(context, isPinAt(numbers[0]));
+  SCPI_ResultBool(context, isOutPinAt(numbers[0]));
   return SCPI_RES_OK;
 }
 
+// TODO gpio in commands
+
+static scpi_result_t SCPI_AnalogInputQ(scpi_t * context) {
+  int32_t numbers[1];
+
+  // retrieve the adc index
+  SCPI_CommandNumbers(context, numbers, 1, 0);
+  if (! ((numbers[0] > -1) && (numbers[0] < adcPinCount()))) {
+    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+    return SCPI_RES_ERR;
+  }
+
+  SCPI_ResultUInt16(context, getAdcPinAt(numbers[0]));
+  return SCPI_RES_OK;
+}
+
+static scpi_result_t SCPI_Analog16InputQ(scpi_t * context) {
+    int32_t numbers[1];
+
+    // retrieve the adc index
+    SCPI_CommandNumbers(context, numbers, 1, 0);
+    if (! ((numbers[0] > -1) && (numbers[0] < adc16PinCount()))) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt16(context, getAdc16PinAt(numbers[0]));
+    return SCPI_RES_OK;
+}
+
+// TODO pwm in commands
 
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
@@ -128,6 +165,11 @@ const scpi_command_t scpi_commands[] = {
     /* custom commands for the switch */
     {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
     {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
+    // TODO gpio in commands
+    // TODO adc commands
+    {.pattern = "ANAlog:INPut#:RAW?", .callback = SCPI_AnalogInputQ,},
+    {.pattern = "ANAlog:HIRES:INPut#:RAW?", .callback = SCPI_Analog16InputQ,},
+    // TODO pwm in commands
     SCPI_CMD_LIST_END
 };
 
@@ -147,7 +189,7 @@ scpi_t scpi_context;
 
 // init helper for this instrument
 void scpi_instrument_init() {
-    initPins(); // if you prefer no dependency on the gpio_utils in main,
+    initInstrument(); // if you prefer no dependency on the gpio_utils in main,
               // you could move this call into the scpi_instrument_init() body.
               // like I did here
     
@@ -179,6 +221,18 @@ size_t SCPI_Write(scpi_t * context, const char * data, size_t len) {
 
 scpi_result_t SCPI_Reset(scpi_t * context) {
     (void) context;
-    initPins();
+    initInstrument();
     return SCPI_RES_OK;   
+}
+
+void initInstrument() {
+    initGpioUtils();
+    initOutPins();
+    // TODO input pins
+    initAdcUtils();
+    initAdcPins();
+    initAdc16I2C();
+    initAdc16Reg();
+    initPwmUtils();
+    initPwmPins();
 }
