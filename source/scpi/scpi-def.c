@@ -139,7 +139,41 @@ static scpi_result_t SCPI_Analog16InputQ(scpi_t * context) {
     return SCPI_RES_OK;
 }
 
-// TODO pwm in commands
+// PWM
+static scpi_result_t SCPI_AnalogOutput(scpi_t * context) {
+    int32_t param1;
+    int32_t numbers[1];
+
+    // retrieve the output index
+    SCPI_CommandNumbers(context, numbers, 1, 0);
+    if (! ((numbers[0] > -1) && (numbers[0] < pwmPinCount()))) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+        return SCPI_RES_ERR;
+    }
+
+    /* read first parameter if present */
+    if (!SCPI_ParamInt32(context, &param1, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    setPwmPinAt(numbers[0], param1);
+
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t SCPI_AnalogOutputQ(scpi_t * context) {
+    int32_t numbers[1];
+
+    // retrieve the pwm index
+    SCPI_CommandNumbers(context, numbers, 1, 0);
+    if (! ((numbers[0] > -1) && (numbers[0] < pwmPinCount()))) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt16(context, getPwmPinAt(numbers[0]));
+    return SCPI_RES_OK;
+}
 
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
@@ -166,10 +200,12 @@ const scpi_command_t scpi_commands[] = {
     {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
     {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
     // TODO gpio in commands
-    // TODO adc commands
+    // adc commands
     {.pattern = "ANAlog:INPut#:RAW?", .callback = SCPI_AnalogInputQ,},
     {.pattern = "ANAlog:HIRES:INPut#:RAW?", .callback = SCPI_Analog16InputQ,},
-    // TODO pwm in commands
+    // pwm commands
+    {.pattern = "ANAlog:OUTPut#:RAW", .callback = SCPI_AnalogOutput,},
+    {.pattern = "ANAlog:OUTPut#:RAW?", .callback = SCPI_AnalogOutputQ,},
     SCPI_CMD_LIST_END
 };
 
