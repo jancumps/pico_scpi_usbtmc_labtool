@@ -9,8 +9,11 @@ project(pico_scpi_usbtmc_labtool C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-#I've set this to allow breakpoints on any source line
-set(PICO_DEOPTIMIZED_DEBUG=1)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "  Diag: maximum debug info")
+    #I've set this to allow breakpoints on any source line
+    set(PICO_DEOPTIMIZED_DEBUG=1)
+endif ()
 
 pico_sdk_init()
 
