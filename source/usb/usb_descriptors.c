@@ -27,6 +27,8 @@
 #include "class/usbtmc/usbtmc.h"
 #include "class/usbtmc/usbtmc_device.h"
 
+#include "hardware/flash.h"
+
 /* A combination of interfaces must have a unique product id, since PC will save device driver after the first plug.
  * Same VID/PID with different interface e.g MSC (first), then CDC (later) will possibly cause system error on PC.
  *
@@ -194,7 +196,8 @@ char const* string_desc_arr [] =
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
   "TinyUSB",                     // 1: Manufacturer
   "TinyUSB Device",              // 2: Product
-  "123456",                      // 3: Serials, should use chip ID
+  // jc: this fixed string will be replaced by Pico's 8 byte unique ID.
+  "88888888",                    // 3: Serial, placeholder for  chip ID
   "TinyUSB USBTMC",              // 4: USBTMC
 };
 
@@ -222,16 +225,28 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
     const char* str = string_desc_arr[index];
 
+
     // Cap at max char
     chr_count = (uint8_t) strlen(str);
     if ( chr_count > 31 ) {
       chr_count = 31;
     }
 
-    // Convert ASCII string into UTF-16
-    for(uint8_t i=0; i<chr_count; i++)
-    {
-      _desc_str[1+i] = str[i];
+    if (index == 3) {
+      uint8_t unique_id[8];
+      flash_get_unique_id(unique_id);
+      // Convert ASCII string into UTF-16
+      for (uint8_t i = 0; i < chr_count; i++)
+      {
+        _desc_str[1 + i] = unique_id[i];
+      }
+
+    } else {
+      // Convert ASCII string into UTF-16
+      for (uint8_t i = 0; i < chr_count; i++)
+      {
+        _desc_str[1 + i] = str[i];
+      }
     }
   }
 

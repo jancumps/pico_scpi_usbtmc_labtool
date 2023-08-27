@@ -53,7 +53,7 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
         $ENV{SCPI_LIB_PATH}/inc
 )
 
-target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c)
+target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c hardware_flash)
 pico_add_extra_outputs(pico_scpi_usbtmc_labtool)
 
 # usb output, uart output
