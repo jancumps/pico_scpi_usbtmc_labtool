@@ -26,7 +26,6 @@ uint8_t confreg[2]; // config register
 /************** functions *****************/
 // initialize the I2C bus
 void initAdc16I2C(void) {
-    i2c_init(i2c_default, 10000); // I2C0 on GPIO 4[SDA],5[SCL]
     gpio_set_function(PICO_DEFAULT_I2C_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(PICO_DEFAULT_I2C_SCL_PIN, GPIO_FUNC_I2C);
     gpio_pull_up(PICO_DEFAULT_I2C_SDA_PIN); // weak pull-ups but enable them anyway
