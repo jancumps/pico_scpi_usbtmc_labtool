@@ -52,6 +52,7 @@
 
 #include "gpio_utils.h"
 #include "adc_utils.h"
+#include "i2c_utils.h"
 #include "adc16_utils.h"
 #include "pwm_utils.h"
 
@@ -264,10 +265,10 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
 void initInstrument() {
     initGpioUtils();
     initOutPins();
+    initI2CUtils();
     // TODO input pins
     initAdcUtils();
     initAdcPins();
-    initAdc16I2C();
     initAdc16Reg();
     initPwmUtils();
     initPwmPins();
