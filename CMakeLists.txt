@@ -54,6 +54,9 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
 )
 
 target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c pico_unique_id)
+
+pico_set_linker_script(pico_scpi_usbtmc_labtool ${CMAKE_SOURCE_DIR}/memmap_custom.ld)
+
 pico_add_extra_outputs(pico_scpi_usbtmc_labtool)
 
 # usb output, uart output
