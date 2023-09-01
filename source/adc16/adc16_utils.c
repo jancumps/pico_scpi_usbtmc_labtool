@@ -23,15 +23,6 @@ uint8_t adc16Installed = 0;
 uint32_t adc16Channel = 0;
 uint8_t confreg[2]; // config register
 
-/************** functions *****************/
-// initialize the I2C bus
-void initAdc16I2C(void) {
-    gpio_set_function(PICO_DEFAULT_I2C_SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(PICO_DEFAULT_I2C_SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(PICO_DEFAULT_I2C_SDA_PIN); // weak pull-ups but enable them anyway
-    gpio_pull_up(PICO_DEFAULT_I2C_SCL_PIN);
-}
-
 // initialize the ADS1115 registers
 void initAdc16Reg(void) {
     uint8_t buf[3];

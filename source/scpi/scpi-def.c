@@ -269,7 +269,6 @@ void initInstrument() {
     // TODO input pins
     initAdcUtils();
     initAdcPins();
-    initAdc16I2C();
     initAdc16Reg();
     initPwmUtils();
     initPwmPins();
