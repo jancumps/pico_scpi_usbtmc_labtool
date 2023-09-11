@@ -9,7 +9,8 @@ uint outPins[] = {
     if you want to use this pin, remove the led_blinking_task() */
     22, 14, 15};
 
-// TODO input pins
+uint inPins[] = {
+    20, 21, 27};
 
 void initGpioUtils() {
     return; // nothing needed
@@ -17,6 +18,10 @@ void initGpioUtils() {
 
 uint32_t outPinCount() {
     return sizeof(outPins)/sizeof(outPins[0]);
+}
+
+uint32_t inPinCount() {
+    return sizeof(inPins)/sizeof(inPins[0]);
 }
 
 void initOutPins() {
