@@ -27,7 +27,7 @@ uint32_t inPinCount() {
 void initOutPins() {
     for (uint32_t i = 0; i < outPinCount(); i++) {
         gpio_init(outPins[i]);
-        gpio_set_dir(outPins[i], 1);
+        gpio_set_dir(outPins[i], true);
         gpio_put(outPins[i], 0);
     }
 }
@@ -35,7 +35,7 @@ void initOutPins() {
 void initInPins() {
     for (uint32_t i = 0; i < inPinCount(); i++) {
         gpio_init(inPins[i]);
-        gpio_set_dir(inPins[i], 1);
+        gpio_set_dir(inPins[i], false);
         gpio_put(inPins[i], 0);
     }
 }
