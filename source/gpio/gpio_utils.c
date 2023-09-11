@@ -32,6 +32,14 @@ void initOutPins() {
     }
 }
 
+void initInPins() {
+    for (uint32_t i = 0; i < inPinCount(); i++) {
+        gpio_init(inPins[i]);
+        gpio_set_dir(inPins[i], 1);
+        gpio_put(inPins[i], 0);
+    }
+}
+
 void setOutPinAt(uint32_t index, bool on) {
     gpio_put(outPins[index], on);
 }
@@ -40,4 +48,6 @@ bool isOutPinAt(uint32_t index) {
     return gpio_get_out_level(outPins[index]);
 }
 
-// TODO input pins
+bool isInPinAt(uint32_t index) {
+    return gpio_get(inPins[index]);
+}
