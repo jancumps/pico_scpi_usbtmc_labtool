@@ -1,5 +1,5 @@
 # pico_scpi_usbtmc_labtool
-proof of concept for a LabVIEW compatible instrument on a Raspberry Pico
+LabVIEW compatible instrument on a Raspberry Pico
 
 Prerequisites:  
 Toolchain (and IDE) that can build Pico projects with CMake  
