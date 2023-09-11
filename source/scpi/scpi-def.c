@@ -110,7 +110,19 @@ static scpi_result_t SCPI_DigitalOutputQ(scpi_t * context) {
   return SCPI_RES_OK;
 }
 
-// TODO gpio in commands
+static scpi_result_t SCPI_DigitalInputQ(scpi_t * context) {
+  int32_t numbers[1];
+
+  // retrieve the output index
+  SCPI_CommandNumbers(context, numbers, 1, 0);
+  if (! ((numbers[0] > -1) && (numbers[0] < inPinCount()))) {
+    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+    return SCPI_RES_ERR;
+  }
+
+  SCPI_ResultBool(context, isInPinAt(numbers[0]));
+  return SCPI_RES_OK;
+}
 
 static scpi_result_t SCPI_AnalogInputQ(scpi_t * context) {
   int32_t numbers[1];
@@ -200,7 +212,7 @@ const scpi_command_t scpi_commands[] = {
     /* custom commands for the switch */
     {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
     {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
-    // TODO gpio in commands
+    {.pattern = "DIGItal:INPut#?", .callback = SCPI_DigitalInputQ,},
     // adc commands
     {.pattern = "ANAlog:INPut#:RAW?", .callback = SCPI_AnalogInputQ,},
     {.pattern = "ANAlog:HIRES:INPut#:RAW?", .callback = SCPI_Analog16InputQ,},
@@ -265,8 +277,8 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
 void initInstrument() {
     initGpioUtils();
     initOutPins();
+    initInPins();
     initI2CUtils();
-    // TODO input pins
     initAdcUtils();
     initAdcPins();
     initAdc16Reg();
