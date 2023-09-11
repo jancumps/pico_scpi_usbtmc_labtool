@@ -11,7 +11,7 @@ bool isOutPinAt(uint32_t index);
 
 uint32_t inPinCount();
 
-void initinPins();
+void initInPins();
 bool isInPinAt(uint32_t index);
 
 #endif // _GPIO_UTILS_H
