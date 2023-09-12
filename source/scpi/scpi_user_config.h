@@ -1,5 +1,12 @@
 #ifndef _SCPI_USER_CONFIG_H
 #define _SCPI_USER_CONFIG_H
 
+#define USE_CUSTOM_REGISTERS 1
+#define USER_REGISTERS
+#define USER_REGISTER_GROUPS
+#define USER_REGISTER_DETAILS
+#define USER_REGISTER_GROUP_DETAILS
+// TODO define custom status registers
+
 
 #endif // _SCPI_USER_CONFIG_H
