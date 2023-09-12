@@ -1,0 +1,5 @@
+#ifndef _SCPI_USER_CONFIG_H
+#define _SCPI_USER_CONFIG_H
+
+
+#endif // _SCPI_USER_CONFIG_H

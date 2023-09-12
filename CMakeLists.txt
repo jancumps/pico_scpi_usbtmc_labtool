@@ -53,6 +53,9 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
 target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c)
 pico_add_extra_outputs(pico_scpi_usbtmc_labtool)
 
+# enable use of scpi_user_config.h, to support custom device specific registers 
+target_compile_definitions(pico_scpi_usbtmc_labtool PRIVATE SCPI_USER_CONFIG=1)
+
 # usb output, uart output
  pico_enable_stdio_usb(pico_scpi_usbtmc_labtool 0)
  pico_enable_stdio_uart(pico_scpi_usbtmc_labtool 0)
