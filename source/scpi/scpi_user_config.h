@@ -24,7 +24,7 @@
         SCPI_REG_NONE, \
         SCPI_REG_NONE, \
         SCPI_REG_STB, \
-        STB_OPS  /* TODO what value should I put here? */ \
+        STB_ESR  /* TODO what value should I put here? */ \
     }, /* USER_REG_GROUP_DIGINEVENT */
 
 #endif // _SCPI_USER_CONFIG_H
