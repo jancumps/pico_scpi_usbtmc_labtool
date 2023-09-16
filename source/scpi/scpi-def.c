@@ -162,6 +162,19 @@ const scpi_command_t scpi_commands[] = {
     {.pattern = "SYSTem:ERRor:COUNt?", .callback = SCPI_SystemErrorCountQ,},
     {.pattern = "SYSTem:VERSion?", .callback = SCPI_SystemVersionQ,},
 
+
+    {.pattern = "STATus:OPERation:EVENt?", .callback = SCPI_StatusOperationEventQ,},
+    {.pattern = "STATus:OPERation:CONDition?", .callback = SCPI_StatusOperationConditionQ,},
+    {.pattern = "STATus:OPERation:ENABle", .callback = SCPI_StatusOperationEnable,},
+    {.pattern = "STATus:OPERation:ENABle?", .callback = SCPI_StatusOperationEnableQ,},
+
+    {.pattern = "STATus:QUEStionable[:EVENt]?", .callback = SCPI_StatusQuestionableEventQ,},
+    /* {.pattern = "STATus:QUEStionable:CONDition?", .callback = scpi_stub_callback,}, */
+    {.pattern = "STATus:QUEStionable:ENABle", .callback = SCPI_StatusQuestionableEnable,},
+    {.pattern = "STATus:QUEStionable:ENABle?", .callback = SCPI_StatusQuestionableEnableQ,},
+
+    {.pattern = "STATus:PRESet", .callback = SCPI_StatusPreset,},
+
     /* custom commands for the switch */
     {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
     {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
