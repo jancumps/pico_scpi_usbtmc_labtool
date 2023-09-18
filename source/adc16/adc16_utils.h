@@ -21,7 +21,6 @@
 #define ADS1115_DIFF_2_3 0x11
 
 /******* functions *********/
-void initAdc16I2C(void);
 void initAdc16Reg(void);
 uint32_t adc16PinCount();
 uint16_t getAdc16PinAt(uint32_t index);

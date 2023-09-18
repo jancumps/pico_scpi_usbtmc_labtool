@@ -9,8 +9,11 @@ project(pico_scpi_usbtmc_labtool C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-#I've set this to allow breakpoints on any source line
-set(PICO_DEOPTIMIZED_DEBUG=1)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "  Diag: maximum debug info")
+    #I've set this to allow breakpoints on any source line
+    set(PICO_DEOPTIMIZED_DEBUG=1)
+endif ()
 
 pico_sdk_init()
 
@@ -27,6 +30,7 @@ add_executable(pico_scpi_usbtmc_labtool
         ${CMAKE_CURRENT_SOURCE_DIR}/source/scpi/scpi-def.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/gpio/gpio_utils.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/adc/adc_utils.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/source/i2c/i2c_utils.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/adc16/adc16_utils.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/pwm/pwm_utils.c
         $ENV{SCPI_LIB_PATH}/src/parser.c
@@ -45,12 +49,16 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/source/scpi
         ${CMAKE_CURRENT_LIST_DIR}/source/gpio
         ${CMAKE_CURRENT_LIST_DIR}/source/adc
+        ${CMAKE_CURRENT_LIST_DIR}/source/i2c
         ${CMAKE_CURRENT_LIST_DIR}/source/adc16
         ${CMAKE_CURRENT_LIST_DIR}/source/pwm
         $ENV{SCPI_LIB_PATH}/inc
 )
 
-target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c)
+target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c pico_unique_id)
+
+pico_set_linker_script(pico_scpi_usbtmc_labtool ${CMAKE_SOURCE_DIR}/memmap_custom.ld)
+
 pico_add_extra_outputs(pico_scpi_usbtmc_labtool)
 
 # enable use of scpi_user_config.h, to support custom device specific registers 
