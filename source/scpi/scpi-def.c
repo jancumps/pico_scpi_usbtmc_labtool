@@ -298,3 +298,7 @@ void initInstrument() {
     initPwmUtils();
     initPwmPins();
 }
+
+void fillRegs() {
+  
+}
