@@ -26,10 +26,10 @@
         USER_REG_DIGINEVENT, \
         USER_REG_DIGINEVENTE, \
         USER_REG_DIGINEVENTC, \
-		USER_REG_DIGINEVENTP, \
-		USER_REG_DIGINEVENTN, \
-		SCPI_REG_OPER, \
-		1  /* TODO this defines to what bit of the parent we trickle through */ \
+	USER_REG_DIGINEVENTP, \
+	USER_REG_DIGINEVENTN, \
+	SCPI_REG_OPER, \
+	1  /* this defines to what bit of the parent we trickle through */ \
     }, /* USER_REG_GROUP_DIGINEVENT */
 
 #endif // _SCPI_USER_CONFIG_H
