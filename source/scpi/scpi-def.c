@@ -299,6 +299,6 @@ void initInstrument() {
     initPwmPins();
 }
 
-void fillRegs() {
-  
+void maintainInstrumentRegs() {
+  // TODO get digital pin in status and write to device dependent register
 }
