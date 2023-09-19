@@ -188,6 +188,108 @@ static scpi_result_t SCPI_AnalogOutputQ(scpi_t * context) {
     return SCPI_RES_OK;
 }
 
+/**
+ * STATus:OPERation:DIGItal:INPut:EVENt?
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputEventQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENT));
+
+    /* clear register */
+    SCPI_RegSet(context, USER_REG_DIGINEVENT, 0);
+
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:CONDition?
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputConditionQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTC));
+
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:ENABle
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputEnable(scpi_t * context) {
+    int32_t new_OPERE;
+    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
+        SCPI_RegSet(context, USER_REG_DIGINEVENTE, (scpi_reg_val_t) new_OPERE);
+    }
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:ENABle?
+ * @param context
+ * @return
+ */
+ scpi_result_t SCPI_StatusOperationDigitalInputEnableQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTE));
+
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:PTRansition
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputPTransition(scpi_t * context) {
+    int32_t new_OPERE;
+    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
+        SCPI_RegSet(context, USER_REG_DIGINEVENTP, (scpi_reg_val_t) new_OPERE);
+    }
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:PTRansition?
+ * @param context
+ * @return
+ */
+ scpi_result_t SCPI_StatusOperationDigitalInputPTransitionQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTP));
+
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:NTRansition
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputNTransition(scpi_t * context) {
+    int32_t new_OPERE;
+    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
+        SCPI_RegSet(context, USER_REG_DIGINEVENTN, (scpi_reg_val_t) new_OPERE);
+    }
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:NTRansition?
+ * @param context
+ * @return
+ */
+ scpi_result_t SCPI_StatusOperationDigitalInputNTransitionQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTN));
+
+    return SCPI_RES_OK;
+}
+
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
     { .pattern = "*CLS", .callback = SCPI_CoreCls,},
@@ -232,6 +334,17 @@ const scpi_command_t scpi_commands[] = {
     // pwm commands
     {.pattern = "ANAlog:OUTPut#:RAW", .callback = SCPI_AnalogOutput,},
     {.pattern = "ANAlog:OUTPut#:RAW?", .callback = SCPI_AnalogOutputQ,},
+
+    // instrument specific registers commands
+    {.pattern = "STATus:OPERation:DIGItal:INPut:EVENt?", .callback = SCPI_StatusOperationDigitalInputEventQ,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:CONDition?", .callback = SCPI_StatusOperationDigitalInputConditionQ,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:ENABle", .callback = SCPI_StatusOperationDigitalInputEnable,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:ENABle?", .callback = SCPI_StatusOperationDigitalInputEnableQ,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:PTRansition", .callback = SCPI_StatusOperationDigitalInputPTransition,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:PTRansition?", .callback = SCPI_StatusOperationDigitalInputPTransitionQ,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition", .callback = SCPI_StatusOperationDigitalInputNTransition,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition?", .callback = SCPI_StatusOperationDigitalInputNTransitionQ,},
+
     SCPI_CMD_LIST_END
 };
 
@@ -299,6 +412,18 @@ void initInstrument() {
     initPwmPins();
 }
 
+/**
+ * current implementation does not use interrupts to set the digital in control register
+*/
+void maintainDigiInReg() {
+    scpi_reg_val_t digi_in = 0U;
+    for (uint32_t i = 0; i < inPinCount(); i++) {
+      int j = isInPinAt(i) << i;      
+      digi_in |= j ;
+    }
+    SCPI_RegSet(&scpi_context, USER_REG_DIGINEVENTC, digi_in);
+}
+
 void maintainInstrumentRegs() {
-  // TODO get digital pin in status and write to device dependent register
+  maintainDigiInReg();
 }
