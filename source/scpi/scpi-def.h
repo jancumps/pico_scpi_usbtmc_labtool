@@ -31,7 +31,7 @@ scpi_result_t SCPI_Reset(scpi_t * context);
 scpi_result_t SCPI_Flush(scpi_t * context);
 
 
-scpi_result_t SCPI_SystemCommTcpipControlQ(scpi_t * context);
+void maintainInstrumentRegs();
 
 #endif /* __SCPI_DEF_H_ */
 

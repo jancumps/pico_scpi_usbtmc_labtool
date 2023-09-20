@@ -36,7 +36,6 @@ void initInPins() {
     for (uint32_t i = 0; i < inPinCount(); i++) {
         gpio_init(inPins[i]);
         gpio_set_dir(inPins[i], false);
-        gpio_put(inPins[i], 0);
     }
 }
 

@@ -66,6 +66,7 @@ int main(void)
   {
     tud_task(); // tinyusb device task
     led_blinking_task();
+    maintainInstrumentRegs();
     usbtmc_app_task_iter();
   }
 

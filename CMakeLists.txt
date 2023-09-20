@@ -61,6 +61,9 @@ pico_set_linker_script(pico_scpi_usbtmc_labtool ${CMAKE_SOURCE_DIR}/memmap_custo
 
 pico_add_extra_outputs(pico_scpi_usbtmc_labtool)
 
+# enable use of scpi_user_config.h, to support custom device specific registers 
+target_compile_definitions(pico_scpi_usbtmc_labtool PRIVATE SCPI_USER_CONFIG=1)
+
 # usb output, uart output
  pico_enable_stdio_usb(pico_scpi_usbtmc_labtool 0)
  pico_enable_stdio_uart(pico_scpi_usbtmc_labtool 0)
