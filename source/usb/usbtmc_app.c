@@ -85,7 +85,6 @@ static volatile uint16_t queryState = 0;
 static volatile uint32_t queryDelayStart;
 static volatile uint32_t bulkInStarted;
 
-// static uint32_t resp_delay = 125u; // Adjustable delay, to allow for better testing // TODO must go
 static size_t buffer_len;
 static size_t buffer_tx_ix; // for transmitting using multiple transfers
 static uint8_t buffer[225]; // A few packets long should be enough.
