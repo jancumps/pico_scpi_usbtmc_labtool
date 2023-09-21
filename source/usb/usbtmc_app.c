@@ -74,7 +74,7 @@ tud_usbtmc_app_capabilities  =
 #define IEEE4882_STB_SER          (0x20u)
 #define IEEE4882_STB_SRQ          (0x40u)
 
-static volatile uint8_t status;
+// static volatile uint8_t status; TODO merge with SCPI-LIB STB
 
 char reply[256];
 size_t reply_len;
