@@ -74,8 +74,6 @@ tud_usbtmc_app_capabilities  =
 #define IEEE4882_STB_SER          (0x20u)
 #define IEEE4882_STB_SRQ          (0x40u)
 
-// static volatile uint8_t status;   // TODO merge with SCPI-LIB STB
-
 char reply[256];
 size_t reply_len;
 bool query_received;
@@ -117,7 +115,9 @@ tud_usbtmc_get_capabilities_cb()
 bool tud_usbtmc_msg_trigger_cb(usbtmc_msg_generic_t* msg) {
   (void)msg;
   // Let trigger set the SRQ
-  status |= IEEE4882_STB_SRQ; // TODO merge with SCPI-LIB STB
+  uint8_t status = getSTB();
+  status |= IEEE4882_STB_SRQ;
+  setSTB(status);
   return true;
 }
 
@@ -163,7 +163,9 @@ bool tud_usbtmc_msgBulkIn_complete_cb()
 {
   if((buffer_tx_ix == buffer_len) || query_received) // done
   {
-    status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV // TODO merge with SCPI-LIB STB
+    uint8_t status = getSTB();
+    status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV
+    setSTB(status);
     queryState = 0;
     bulkInStarted = 0;
     buffer_tx_ix = 0;
@@ -214,8 +216,10 @@ void usbtmc_app_task_iter(void) {
     break;
   case 2:
     queryState=3;
-    status |= 0x10u; // MAV // TODO merge with SCPI-LIB STB
-    status |= 0x40u; // SRQ // TODO merge with SCPI-LIB STB
+    uint8_t status = getSTB();
+    status |= 0x10u; // MAV
+    status |= 0x40u; // SRQ
+    setSTB(status);
     break;
   case 3: // time to transmit;
     if(/* TODO check if I can just ignore this*/ bulkInStarted &&  (buffer_tx_ix == 0)) {
@@ -245,7 +249,9 @@ bool tud_usbtmc_initiate_clear_cb(uint8_t *tmcResult)
   *tmcResult = USBTMC_STATUS_SUCCESS;
   queryState = 0;
   bulkInStarted = false;
-  status = 0; // TODO merge with SCPI-LIB STB
+  uint8_t status = getSTB();
+  status = 0;
+  setSTB(status);
   return true;
 }
 
@@ -253,7 +259,9 @@ bool tud_usbtmc_check_clear_cb(usbtmc_get_clear_status_rsp_t *rsp)
 {
   queryState = 0;
   bulkInStarted = false;
-  status = 0; // TODO merge with SCPI-LIB STB
+  uint8_t status = getSTB();
+  status = 0;
+  setSTB(status);
   buffer_tx_ix = 0u;
   buffer_len = 0u;
   rsp->USBTMC_status = USBTMC_STATUS_SUCCESS;
@@ -297,8 +305,10 @@ void tud_usbtmc_bulkOut_clearFeature_cb(void)
 // Return status byte, but put the transfer result status code in the rspResult argument.
 uint8_t tud_usbtmc_get_stb_cb(uint8_t *tmcResult)
 {
-  uint8_t old_status = status; // TODO merge with SCPI-LIB STB
-  status = (uint8_t)(status & ~(IEEE4882_STB_SRQ)); // clear SRQ // TODO merge with SCPI-LIB STB
+  uint8_t status = getSTB();
+  uint8_t old_status = status;
+  status = (uint8_t)(status & ~(IEEE4882_STB_SRQ)); // clear SRQ
+  setSTB(status);
 
   *tmcResult = USBTMC_STATUS_SUCCESS;
   // Increment status so that we see different results on each read...

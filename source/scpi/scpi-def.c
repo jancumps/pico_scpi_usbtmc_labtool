@@ -400,6 +400,14 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
     return SCPI_RES_OK;   
 }
 
+uint8_t getSTB() {
+    return (uint8_t) SCPI_RegGet(&scpi_context, SCPI_REG_STB);
+}
+
+void setSTB(uint8_t stb) {
+    SCPI_RegSet(&scpi_context, SCPI_REG_STB, (scpi_reg_val_t) stb);    
+}
+
 void initInstrument() {
     initGpioUtils();
     initOutPins();
