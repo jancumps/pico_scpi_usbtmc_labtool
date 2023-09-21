@@ -80,9 +80,8 @@ char reply[256];
 size_t reply_len;
 bool query_received;
 
-// 0=not query, 1=queried, 2=ready?
+// 0=not query, 1=queried, 2=set(MAV), 3=ready?
 static volatile uint16_t queryState = 0;
-static volatile uint32_t queryDelayStart;
 static volatile uint32_t bulkInStarted;
 
 static size_t buffer_len;
@@ -211,10 +210,14 @@ void usbtmc_app_task_iter(void) {
   case 0:
     break;
   case 1:
-    queryDelayStart = board_millis();
     queryState = 2;
     break;
-  case 2: // time to transmit;
+  case 2:
+    queryState=3;
+    status |= 0x10u; // MAV // TODO merge with SCPI-LIB STB
+    status |= 0x40u; // SRQ // TODO merge with SCPI-LIB STB
+    break;
+  case 3: // time to transmit;
     if(/* TODO check if I can just ignore this*/ bulkInStarted &&  (buffer_tx_ix == 0)) {
       if(reply_len)
       {
