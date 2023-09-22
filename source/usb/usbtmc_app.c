@@ -74,19 +74,14 @@ tud_usbtmc_app_capabilities  =
 #define IEEE4882_STB_SER          (0x20u)
 #define IEEE4882_STB_SRQ          (0x40u)
 
-static volatile uint8_t status;
-
 char reply[256];
 size_t reply_len;
 bool query_received;
 
-// 0=not query, 1=queried, 2=delay,set(MAV), 3=delay 4=ready?
-// (to simulate delay)
+// 0=not query, 1=queried, 2=set(MAV), 3=ready?
 static volatile uint16_t queryState = 0;
-static volatile uint32_t queryDelayStart;
 static volatile uint32_t bulkInStarted;
 
-static uint32_t resp_delay = 125u; // Adjustable delay, to allow for better testing
 static size_t buffer_len;
 static size_t buffer_tx_ix; // for transmitting using multiple transfers
 static uint8_t buffer[225]; // A few packets long should be enough.
@@ -120,7 +115,9 @@ tud_usbtmc_get_capabilities_cb()
 bool tud_usbtmc_msg_trigger_cb(usbtmc_msg_generic_t* msg) {
   (void)msg;
   // Let trigger set the SRQ
+  uint8_t status = getSTB();
   status |= IEEE4882_STB_SRQ;
+  setSTB(status);
   return true;
 }
 
@@ -158,16 +155,6 @@ bool tud_usbtmc_msg_data_cb(void *data, size_t len, bool transfer_complete)
     query_received = true;
     scpi_instrument_input(data, len);
   }
-  if(transfer_complete && !strncasecmp("delay ",data,5))
-  {
-    queryState = 0;
-    int d = atoi((char*)data + 5);
-    if(d > 10000)
-      d = 10000;
-    if(d<0)
-      d=0;
-    resp_delay = (uint32_t)d;
-  }
   tud_usbtmc_start_bus_read();
   return true;
 }
@@ -176,7 +163,9 @@ bool tud_usbtmc_msgBulkIn_complete_cb()
 {
   if((buffer_tx_ix == buffer_len) || query_received) // done
   {
+    uint8_t status = getSTB();
     status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV
+    setSTB(status);
     queryState = 0;
     bulkInStarted = 0;
     buffer_tx_ix = 0;
@@ -223,23 +212,16 @@ void usbtmc_app_task_iter(void) {
   case 0:
     break;
   case 1:
-    queryDelayStart = board_millis();
     queryState = 2;
     break;
   case 2:
-    if( (board_millis() - queryDelayStart) > resp_delay) {
-      queryDelayStart = board_millis();
-      queryState=3;
-      status |= 0x10u; // MAV
-      status |= 0x40u; // SRQ
-    }
+    queryState=3;
+    uint8_t status = getSTB();
+    status |= 0x10u; // MAV
+    status |= 0x40u; // SRQ
+    setSTB(status);
     break;
-  case 3:
-    if( (board_millis() - queryDelayStart) > resp_delay) {
-      queryState = 4;
-    }
-    break;
-  case 4: // time to transmit;
+  case 3: // time to transmit;
     if(/* TODO check if I can just ignore this*/ bulkInStarted &&  (buffer_tx_ix == 0)) {
       if(reply_len)
       {
@@ -267,7 +249,9 @@ bool tud_usbtmc_initiate_clear_cb(uint8_t *tmcResult)
   *tmcResult = USBTMC_STATUS_SUCCESS;
   queryState = 0;
   bulkInStarted = false;
+  uint8_t status = getSTB();
   status = 0;
+  setSTB(status);
   return true;
 }
 
@@ -275,7 +259,9 @@ bool tud_usbtmc_check_clear_cb(usbtmc_get_clear_status_rsp_t *rsp)
 {
   queryState = 0;
   bulkInStarted = false;
+  uint8_t status = getSTB();
   status = 0;
+  setSTB(status);
   buffer_tx_ix = 0u;
   buffer_len = 0u;
   rsp->USBTMC_status = USBTMC_STATUS_SUCCESS;
@@ -319,8 +305,10 @@ void tud_usbtmc_bulkOut_clearFeature_cb(void)
 // Return status byte, but put the transfer result status code in the rspResult argument.
 uint8_t tud_usbtmc_get_stb_cb(uint8_t *tmcResult)
 {
+  uint8_t status = getSTB();
   uint8_t old_status = status;
   status = (uint8_t)(status & ~(IEEE4882_STB_SRQ)); // clear SRQ
+  setSTB(status);
 
   *tmcResult = USBTMC_STATUS_SUCCESS;
   // Increment status so that we see different results on each read...
