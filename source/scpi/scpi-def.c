@@ -290,6 +290,25 @@ scpi_result_t SCPI_StatusOperationDigitalInputNTransition(scpi_t * context) {
     return SCPI_RES_OK;
 }
 
+void triggerHandler() {
+    // this function is the handler for SCPI and usbtmc trigger requests.
+    // current firmware ignores triggers
+    // if there is a use for it, move this to the dedicated module
+    return;
+}
+
+/**
+ * *TRG - This command asserts trigger. 
+ *        https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/functions/visa-assert-trigger.html
+ * @param context
+ * @return 
+ */
+scpi_result_t SCPI_VisaTrg(scpi_t * context) {
+    (void) context;
+    triggerHandler();
+    return SCPI_RES_OK;
+}
+
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
     { .pattern = "*CLS", .callback = SCPI_CoreCls,},
@@ -344,6 +363,11 @@ const scpi_command_t scpi_commands[] = {
     {.pattern = "STATus:OPERation:DIGItal:INPut:PTRansition?", .callback = SCPI_StatusOperationDigitalInputPTransitionQ,},
     {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition", .callback = SCPI_StatusOperationDigitalInputNTransition,},
     {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition?", .callback = SCPI_StatusOperationDigitalInputNTransitionQ,},
+
+    // VISA commands
+    // support VISA ASSERT TRIGGER 
+    // https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/functions/visa-assert-trigger.html
+    { .pattern = "*TRG", .callback = SCPI_VisaTrg,},
 
     SCPI_CMD_LIST_END
 };
@@ -417,6 +441,10 @@ uint8_t getSTB() {
 
 void setSTB(uint8_t stb) {
     SCPI_RegSet(&scpi_context, SCPI_REG_STB, (scpi_reg_val_t) stb);    
+}
+
+void doTrigger() {
+    triggerHandler();
 }
 
 void initInstrument() {

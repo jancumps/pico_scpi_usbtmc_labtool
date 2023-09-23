@@ -114,10 +114,17 @@ tud_usbtmc_get_capabilities_cb()
 
 bool tud_usbtmc_msg_trigger_cb(usbtmc_msg_generic_t* msg) {
   (void)msg;
+  doTrigger();
+  // TODO: check if this is TinyUSB example code, or needed
+  // TODO: locks usb communication after trigger, 
+  // until a usbtmc clear command is sent
+  // not related with adding the doTrigger() call above...
+  // is this related with setting the SCPI-LIB STB below?
   // Let trigger set the SRQ
   uint8_t status = getSTB();
   status |= IEEE4882_STB_SRQ;
   setSTB(status);
+
   return true;
 }
 

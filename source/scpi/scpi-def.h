@@ -33,6 +33,7 @@ scpi_result_t SCPI_Flush(scpi_t * context);
 // helper functions to simplyfy integration of TinyUSB tmcusb and the scpi-lib
 uint8_t getSTB();
 void setSTB(uint8_t);
+void doTrigger();
 
 
 void maintainInstrumentRegs();
