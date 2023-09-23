@@ -351,7 +351,7 @@ const scpi_command_t scpi_commands[] = {
 scpi_interface_t scpi_interface = {
     .error = NULL,            // haven't implemented an error logger
     .write = SCPI_Write,
-    .control = NULL,        // haven't implemented communication channel control
+    .control = SCPI_Control,
     .flush = NULL,            // don't need flush for SCI / USB
     .reset = SCPI_Reset,
 };
@@ -398,6 +398,17 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
     (void) context;
     initInstrument();
     return SCPI_RES_OK;   
+}
+
+scpi_result_t SCPI_Control(scpi_t* context, scpi_ctrl_name_t ctrl, scpi_reg_val_t val)
+{
+    (void)context;
+    (void) val;
+
+    if (SCPI_CTRL_SRQ == ctrl) {
+        setControlReply();
+    }
+    return SCPI_RES_OK;
 }
 
 uint8_t getSTB() {
