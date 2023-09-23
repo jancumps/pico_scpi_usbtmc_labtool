@@ -328,7 +328,15 @@ void setReply (const char *data, size_t len) {
   // attach replies to the buffer until the SCPI engine is finished.
   // no one should run away with the data, because only one core has focus 
   // on scpi engine and USB state machine 
-  // TODO verify
   memcpy(reply + (reply_len * sizeof reply[0]), data, len);
   reply_len += len;
 }
+
+void setControlReply () {
+  // TODO find how to support service request calls 
+/*   reply[0] = 0x81;
+  reply[1] = getSTB();
+  reply_len = 2;
+  // queryState = 1; nah */
+}
+
