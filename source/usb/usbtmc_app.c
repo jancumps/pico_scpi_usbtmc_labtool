@@ -119,6 +119,7 @@ bool tud_usbtmc_msg_trigger_cb(usbtmc_msg_generic_t* msg) {
   // TODO: locks usb communication after trigger, 
   // until a usbtmc clear command is sent
   // not related with adding the doTrigger() call above...
+  // it also fails and time outs in the TinyUSB example program
   // is this related with setting the SCPI-LIB STB below?
   // Let trigger set the SRQ
   uint8_t status = getSTB();
