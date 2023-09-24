@@ -300,13 +300,14 @@ void triggerHandler() {
 /**
  * *TRG - This command asserts trigger. 
  *        https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/functions/visa-assert-trigger.html
+ *        throw SCPI error, because not implemented
  * @param context
  * @return 
  */
 scpi_result_t SCPI_VisaTrg(scpi_t * context) {
-    (void) context;
     triggerHandler();
-    return SCPI_RES_OK;
+    SCPI_ErrorPush(context, SCPI_ERROR_UNDEFINED_HEADER); // TODO: remove when trigger implemented
+    return SCPI_RES_ERR; // TODO: return OK when trigger implemented
 }
 
 const scpi_command_t scpi_commands[] = {
