@@ -30,8 +30,13 @@ scpi_result_t SCPI_Control(scpi_t * context, scpi_ctrl_name_t ctrl, scpi_reg_val
 scpi_result_t SCPI_Reset(scpi_t * context);
 scpi_result_t SCPI_Flush(scpi_t * context);
 
+// helper functions to simplyfy integration of TinyUSB tmcusb and the scpi-lib
+uint8_t getSTB();
+void setSTB(uint8_t);
+void doTrigger();
 
-scpi_result_t SCPI_SystemCommTcpipControlQ(scpi_t * context);
+
+void maintainInstrumentRegs();
 
 #endif /* __SCPI_DEF_H_ */
 

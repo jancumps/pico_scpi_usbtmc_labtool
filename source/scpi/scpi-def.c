@@ -188,6 +188,128 @@ static scpi_result_t SCPI_AnalogOutputQ(scpi_t * context) {
     return SCPI_RES_OK;
 }
 
+/**
+ * STATus:OPERation:DIGItal:INPut:EVENt?
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputEventQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENT));
+
+    /* clear register */
+    SCPI_RegSet(context, USER_REG_DIGINEVENT, 0);
+
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:CONDition?
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputConditionQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTC));
+
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:ENABle
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputEnable(scpi_t * context) {
+    int32_t new_OPERE;
+    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
+        SCPI_RegSet(context, USER_REG_DIGINEVENTE, (scpi_reg_val_t) new_OPERE);
+    }
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:ENABle?
+ * @param context
+ * @return
+ */
+ scpi_result_t SCPI_StatusOperationDigitalInputEnableQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTE));
+
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:PTRansition
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputPTransition(scpi_t * context) {
+    int32_t new_OPERE;
+    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
+        SCPI_RegSet(context, USER_REG_DIGINEVENTP, (scpi_reg_val_t) new_OPERE);
+    }
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:PTRansition?
+ * @param context
+ * @return
+ */
+ scpi_result_t SCPI_StatusOperationDigitalInputPTransitionQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTP));
+
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:NTRansition
+ * @param context
+ * @return
+ */
+scpi_result_t SCPI_StatusOperationDigitalInputNTransition(scpi_t * context) {
+    int32_t new_OPERE;
+    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
+        SCPI_RegSet(context, USER_REG_DIGINEVENTN, (scpi_reg_val_t) new_OPERE);
+    }
+    return SCPI_RES_OK;
+}
+
+/**
+ * STATus:OPERation:DIGItal:INPut:NTRansition?
+ * @param context
+ * @return
+ */
+ scpi_result_t SCPI_StatusOperationDigitalInputNTransitionQ(scpi_t * context) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTN));
+
+    return SCPI_RES_OK;
+}
+
+void triggerHandler() {
+    // this function is the handler for SCPI and usbtmc trigger requests.
+    // current firmware ignores triggers
+    // if there is a use for it, move this to the dedicated module
+    return;
+}
+
+/**
+ * *TRG - This command asserts trigger. 
+ *        https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/functions/visa-assert-trigger.html
+ *        throw SCPI error, because not implemented
+ * @param context
+ * @return 
+ */
+scpi_result_t SCPI_VisaTrg(scpi_t * context) {
+    triggerHandler();
+    SCPI_ErrorPush(context, SCPI_ERROR_UNDEFINED_HEADER); // TODO: remove when trigger implemented
+    return SCPI_RES_ERR; // TODO: return OK when trigger implemented
+}
+
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
     { .pattern = "*CLS", .callback = SCPI_CoreCls,},
@@ -209,6 +331,19 @@ const scpi_command_t scpi_commands[] = {
     {.pattern = "SYSTem:ERRor:COUNt?", .callback = SCPI_SystemErrorCountQ,},
     {.pattern = "SYSTem:VERSion?", .callback = SCPI_SystemVersionQ,},
 
+
+    {.pattern = "STATus:OPERation:EVENt?", .callback = SCPI_StatusOperationEventQ,},
+    {.pattern = "STATus:OPERation:CONDition?", .callback = SCPI_StatusOperationConditionQ,},
+    {.pattern = "STATus:OPERation:ENABle", .callback = SCPI_StatusOperationEnable,},
+    {.pattern = "STATus:OPERation:ENABle?", .callback = SCPI_StatusOperationEnableQ,},
+
+    {.pattern = "STATus:QUEStionable[:EVENt]?", .callback = SCPI_StatusQuestionableEventQ,},
+    /* {.pattern = "STATus:QUEStionable:CONDition?", .callback = scpi_stub_callback,}, */
+    {.pattern = "STATus:QUEStionable:ENABle", .callback = SCPI_StatusQuestionableEnable,},
+    {.pattern = "STATus:QUEStionable:ENABle?", .callback = SCPI_StatusQuestionableEnableQ,},
+
+    {.pattern = "STATus:PRESet", .callback = SCPI_StatusPreset,},
+
     /* custom commands for the switch */
     {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
     {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
@@ -219,13 +354,29 @@ const scpi_command_t scpi_commands[] = {
     // pwm commands
     {.pattern = "ANAlog:OUTPut#:RAW", .callback = SCPI_AnalogOutput,},
     {.pattern = "ANAlog:OUTPut#:RAW?", .callback = SCPI_AnalogOutputQ,},
+
+    // instrument specific registers commands
+    {.pattern = "STATus:OPERation:DIGItal:INPut:EVENt?", .callback = SCPI_StatusOperationDigitalInputEventQ,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:CONDition?", .callback = SCPI_StatusOperationDigitalInputConditionQ,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:ENABle", .callback = SCPI_StatusOperationDigitalInputEnable,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:ENABle?", .callback = SCPI_StatusOperationDigitalInputEnableQ,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:PTRansition", .callback = SCPI_StatusOperationDigitalInputPTransition,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:PTRansition?", .callback = SCPI_StatusOperationDigitalInputPTransitionQ,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition", .callback = SCPI_StatusOperationDigitalInputNTransition,},
+    {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition?", .callback = SCPI_StatusOperationDigitalInputNTransitionQ,},
+
+    // VISA commands
+    // support VISA ASSERT TRIGGER 
+    // https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/functions/visa-assert-trigger.html
+    { .pattern = "*TRG", .callback = SCPI_VisaTrg,},
+
     SCPI_CMD_LIST_END
 };
 
 scpi_interface_t scpi_interface = {
     .error = NULL,            // haven't implemented an error logger
     .write = SCPI_Write,
-    .control = NULL,        // haven't implemented communication channel control
+    .control = SCPI_Control,
     .flush = NULL,            // don't need flush for SCI / USB
     .reset = SCPI_Reset,
 };
@@ -274,6 +425,29 @@ scpi_result_t SCPI_Reset(scpi_t * context) {
     return SCPI_RES_OK;   
 }
 
+scpi_result_t SCPI_Control(scpi_t* context, scpi_ctrl_name_t ctrl, scpi_reg_val_t val)
+{
+    (void)context;
+    (void) val;
+
+    if (SCPI_CTRL_SRQ == ctrl) {
+        setControlReply();
+    }
+    return SCPI_RES_OK;
+}
+
+uint8_t getSTB() {
+    return (uint8_t) SCPI_RegGet(&scpi_context, SCPI_REG_STB);
+}
+
+void setSTB(uint8_t stb) {
+    SCPI_RegSet(&scpi_context, SCPI_REG_STB, (scpi_reg_val_t) stb);    
+}
+
+void doTrigger() {
+    triggerHandler();
+}
+
 void initInstrument() {
     initGpioUtils();
     initOutPins();
@@ -284,4 +458,20 @@ void initInstrument() {
     initAdc16Reg();
     initPwmUtils();
     initPwmPins();
+}
+
+/**
+ * current implementation does not use interrupts to set the digital in control register
+*/
+void maintainDigiInReg() {
+    scpi_reg_val_t digi_in = 0U;
+    for (uint32_t i = 0; i < inPinCount(); i++) {
+      int j = isInPinAt(i) << i;      
+      digi_in |= j ;
+    }
+    SCPI_RegSet(&scpi_context, USER_REG_DIGINEVENTC, digi_in);
+}
+
+void maintainInstrumentRegs() {
+  maintainDigiInReg();
 }
