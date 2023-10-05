@@ -231,7 +231,7 @@ void usbtmc_app_task_iter(void) {
     break;
   case 3: // time to transmit;
     if(/* TODO check if I can just ignore this*/ bulkInStarted &&  (buffer_tx_ix == 0)) {
-      if(reply_len)
+      if(reply_len) // if this was a SCPI query, there will be a reply.
       {
         tud_usbtmc_transmit_dev_msg_data(reply,  tu_min32(reply_len,msgReqLen),true,false);
         queryState = 0;
@@ -244,6 +244,22 @@ void usbtmc_app_task_iter(void) {
         tud_usbtmc_transmit_dev_msg_data(buffer, buffer_tx_ix, buffer_tx_ix == buffer_len, false);
       }
       // MAV is cleared in the transfer complete callback.
+    }
+    else { // this is not thread safe. When you port this to a multi-threaded device, take care to put guard rails
+      // jc 20231004: when there is no reply from the scpi engine (the input was a command, not a query)
+      // mark as if a reply was sent
+      // MAV is cleared here
+      if(! reply_len) { 
+        // if this was a SCPI query, reply_len woulkd be > 0
+        // and tud_usbtmc_msgBulkIn_complete_cb() would clear all of this.
+        uint8_t status = getSTB();
+        status &= (uint8_t) ~(IEEE4882_STB_MAV); // clear MAV
+        setSTB(status);
+        queryState = 0;
+        bulkInStarted = 0;
+        buffer_tx_ix = 0;
+        query_received = false;
+      }
     }
     break;
   default:
