@@ -238,6 +238,10 @@ void usbtmc_app_task_iter(void) {
       }
       // MAV is cleared in the transfer complete callback.
     }
+    if((queryState == 2) && (!reply_len)) { // we didn't get a reply from SCPI lib
+      queryState = 0; // if the lib didn't reply, it means the scpi sentence didn't generate one
+    }
+
     break;
   default:
     TU_ASSERT(false,);
