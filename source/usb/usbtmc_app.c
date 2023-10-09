@@ -75,16 +75,16 @@ tud_usbtmc_app_capabilities  =
 #define IEEE4882_STB_SRQ          (0x40u)
 
 typedef enum {
-    no_query,
-    queried,
-    ready_to_transmit
+    ready_for_scpi_cmd,
+    scpi_cmd_received,
+    ready_to_reply
 } t_querystate;
 
 char reply[256];
 size_t reply_len;
 bool query_received;
 
-static volatile t_querystate queryState = no_query;
+static volatile t_querystate queryState = ready_for_scpi_cmd;
 static volatile bool bulkInStarted;
 
 static size_t buffer_len;
@@ -159,7 +159,7 @@ bool tud_usbtmc_msg_data_cb(void *data, size_t len, bool transfer_complete)
   {
     return false; // buffer overflow!
   }
-  queryState = transfer_complete ? queried : no_query;
+  queryState = transfer_complete ? scpi_cmd_received : ready_for_scpi_cmd;
   reply_len = 0;
   query_received = false;
 
@@ -179,7 +179,7 @@ bool tud_usbtmc_msgBulkIn_complete_cb()
     uint8_t status = getSTB();
     status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV
     setSTB(status);
-    queryState = no_query;
+    queryState = ready_for_scpi_cmd;
     bulkInStarted = false;
     buffer_tx_ix = 0;
     query_received = false;
@@ -201,7 +201,7 @@ bool tud_usbtmc_msgBulkIn_request_cb(usbtmc_msg_request_dev_dep_in const * reque
 #ifdef xDEBUG
   uart_tx_str_sync("MSG_IN_DATA: Requested!\r\n");
 #endif
-  if(queryState == no_query || (buffer_tx_ix == 0))
+  if(queryState == ready_for_scpi_cmd || (buffer_tx_ix == 0))
   {
     TU_ASSERT(bulkInStarted == false);
     bulkInStarted = true;
@@ -222,17 +222,17 @@ bool tud_usbtmc_msgBulkIn_request_cb(usbtmc_msg_request_dev_dep_in const * reque
 
 void usbtmc_app_task_iter(void) {
   switch(queryState) {
-  case no_query:
+  case ready_for_scpi_cmd:
     break;
-  case queried:
-    queryState = ready_to_transmit;
+  case scpi_cmd_received:
+    queryState = ready_to_reply;
     break;
   case 2: // time to transmit;
     if(bulkInStarted &&  (buffer_tx_ix == 0)) {
       if(reply_len) // if this was a SCPI query, there will be a reply.
       {
         tud_usbtmc_transmit_dev_msg_data(reply,  tu_min32(reply_len,msgReqLen),true,false);
-        queryState = no_query;
+        queryState = ready_for_scpi_cmd;
         bulkInStarted = false;
         reply_len = 0;
       }
@@ -243,8 +243,8 @@ void usbtmc_app_task_iter(void) {
       }
       // MAV is cleared in the transfer complete callback.
     }
-    if((queryState == ready_to_transmit) && (!reply_len)) { // we didn't get a reply from SCPI lib
-      queryState = no_query; // if the lib didn't reply, it means the scpi sentence didn't generate one
+    if((queryState == ready_to_reply) && (!reply_len)) { // we didn't get a reply from SCPI lib
+      queryState = ready_for_scpi_cmd; // if the lib didn't reply, it means the scpi sentence didn't generate one
     }
 
     break;
@@ -257,7 +257,7 @@ void usbtmc_app_task_iter(void) {
 bool tud_usbtmc_initiate_clear_cb(uint8_t *tmcResult)
 {
   *tmcResult = USBTMC_STATUS_SUCCESS;
-  queryState = no_query;
+  queryState = ready_for_scpi_cmd;
   bulkInStarted = false;
   uint8_t status = getSTB();
   status = 0;
@@ -267,7 +267,7 @@ bool tud_usbtmc_initiate_clear_cb(uint8_t *tmcResult)
 
 bool tud_usbtmc_check_clear_cb(usbtmc_get_clear_status_rsp_t *rsp)
 {
-  queryState = no_query;
+  queryState = ready_for_scpi_cmd;
   bulkInStarted = false;
   uint8_t status = getSTB();
   status = 0;
