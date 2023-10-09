@@ -188,19 +188,32 @@ static scpi_result_t SCPI_AnalogOutputQ(scpi_t * context) {
     return SCPI_RES_OK;
 }
 
+
+scpi_result_t SCPI_ReadReg(scpi_t * context, scpi_reg_name_t name) {
+    /* return value */
+    SCPI_ResultInt32(context, SCPI_RegGet(context, name));
+
+    /* clear register */
+    SCPI_RegSet(context, name, 0);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t SCPI_WriteReg(scpi_t * context, scpi_reg_name_t name) {
+    int32_t new_OPERE;
+    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
+        SCPI_RegSet(context, name, (scpi_reg_val_t) new_OPERE);
+    }
+    return SCPI_RES_OK;
+}
+
 /**
  * STATus:OPERation:DIGItal:INPut:EVENt?
  * @param context
  * @return
  */
 scpi_result_t SCPI_StatusOperationDigitalInputEventQ(scpi_t * context) {
-    /* return value */
-    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENT));
-
-    /* clear register */
-    SCPI_RegSet(context, USER_REG_DIGINEVENT, 0);
-
-    return SCPI_RES_OK;
+    return SCPI_ReadReg(context, USER_REG_DIGINEVENT);
 }
 
 /**
@@ -209,10 +222,7 @@ scpi_result_t SCPI_StatusOperationDigitalInputEventQ(scpi_t * context) {
  * @return
  */
 scpi_result_t SCPI_StatusOperationDigitalInputConditionQ(scpi_t * context) {
-    /* return value */
-    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTC));
-
-    return SCPI_RES_OK;
+    return SCPI_ReadReg(context, USER_REG_DIGINEVENTC);
 }
 
 /**
@@ -221,11 +231,7 @@ scpi_result_t SCPI_StatusOperationDigitalInputConditionQ(scpi_t * context) {
  * @return
  */
 scpi_result_t SCPI_StatusOperationDigitalInputEnable(scpi_t * context) {
-    int32_t new_OPERE;
-    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
-        SCPI_RegSet(context, USER_REG_DIGINEVENTE, (scpi_reg_val_t) new_OPERE);
-    }
-    return SCPI_RES_OK;
+    return SCPI_WriteReg(context, USER_REG_DIGINEVENTE);
 }
 
 /**
@@ -234,10 +240,7 @@ scpi_result_t SCPI_StatusOperationDigitalInputEnable(scpi_t * context) {
  * @return
  */
  scpi_result_t SCPI_StatusOperationDigitalInputEnableQ(scpi_t * context) {
-    /* return value */
-    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTE));
-
-    return SCPI_RES_OK;
+    return SCPI_ReadReg(context, USER_REG_DIGINEVENTE);
 }
 
 /**
@@ -246,11 +249,7 @@ scpi_result_t SCPI_StatusOperationDigitalInputEnable(scpi_t * context) {
  * @return
  */
 scpi_result_t SCPI_StatusOperationDigitalInputPTransition(scpi_t * context) {
-    int32_t new_OPERE;
-    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
-        SCPI_RegSet(context, USER_REG_DIGINEVENTP, (scpi_reg_val_t) new_OPERE);
-    }
-    return SCPI_RES_OK;
+    return SCPI_WriteReg(context, USER_REG_DIGINEVENTP);
 }
 
 /**
@@ -259,10 +258,7 @@ scpi_result_t SCPI_StatusOperationDigitalInputPTransition(scpi_t * context) {
  * @return
  */
  scpi_result_t SCPI_StatusOperationDigitalInputPTransitionQ(scpi_t * context) {
-    /* return value */
-    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTP));
-
-    return SCPI_RES_OK;
+    return SCPI_ReadReg(context, USER_REG_DIGINEVENTP);
 }
 
 /**
@@ -271,11 +267,7 @@ scpi_result_t SCPI_StatusOperationDigitalInputPTransition(scpi_t * context) {
  * @return
  */
 scpi_result_t SCPI_StatusOperationDigitalInputNTransition(scpi_t * context) {
-    int32_t new_OPERE;
-    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
-        SCPI_RegSet(context, USER_REG_DIGINEVENTN, (scpi_reg_val_t) new_OPERE);
-    }
-    return SCPI_RES_OK;
+    return SCPI_WriteReg(context, USER_REG_DIGINEVENTN);
 }
 
 /**
@@ -284,10 +276,7 @@ scpi_result_t SCPI_StatusOperationDigitalInputNTransition(scpi_t * context) {
  * @return
  */
  scpi_result_t SCPI_StatusOperationDigitalInputNTransitionQ(scpi_t * context) {
-    /* return value */
-    SCPI_ResultInt32(context, SCPI_RegGet(context, USER_REG_DIGINEVENTN));
-
-    return SCPI_RES_OK;
+    return SCPI_ReadReg(context, USER_REG_DIGINEVENTN);
 }
 
 void triggerHandler() {
