@@ -74,13 +74,18 @@ tud_usbtmc_app_capabilities  =
 #define IEEE4882_STB_SER          (0x20u)
 #define IEEE4882_STB_SRQ          (0x40u)
 
+typedef enum {
+    no_query,
+    queried,
+    ready_to_transmit
+} t_querystate;
+
 char reply[256];
 size_t reply_len;
 bool query_received;
 
-// 0=not query, 1=queried, 2=ready?
-static volatile uint16_t queryState = 0;
-static volatile uint32_t bulkInStarted;
+static volatile t_querystate queryState = no_query;
+static volatile bool bulkInStarted;
 
 static size_t buffer_len;
 static size_t buffer_tx_ix; // for transmitting using multiple transfers
@@ -154,7 +159,7 @@ bool tud_usbtmc_msg_data_cb(void *data, size_t len, bool transfer_complete)
   {
     return false; // buffer overflow!
   }
-  queryState = transfer_complete;
+  queryState = transfer_complete ? queried : no_query;
   reply_len = 0;
   query_received = false;
 
@@ -174,8 +179,8 @@ bool tud_usbtmc_msgBulkIn_complete_cb()
     uint8_t status = getSTB();
     status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV
     setSTB(status);
-    queryState = 0;
-    bulkInStarted = 0;
+    queryState = no_query;
+    bulkInStarted = false;
     buffer_tx_ix = 0;
     query_received = false;
   }
@@ -196,10 +201,10 @@ bool tud_usbtmc_msgBulkIn_request_cb(usbtmc_msg_request_dev_dep_in const * reque
 #ifdef xDEBUG
   uart_tx_str_sync("MSG_IN_DATA: Requested!\r\n");
 #endif
-  if(queryState == 0 || (buffer_tx_ix == 0))
+  if(queryState == no_query || (buffer_tx_ix == 0))
   {
-    TU_ASSERT(bulkInStarted == 0);
-    bulkInStarted = 1;
+    TU_ASSERT(bulkInStarted == false);
+    bulkInStarted = true;
 
     // > If a USBTMC interface receives a Bulk-IN request prior to receiving a USBTMC command message
     //   that expects a response, the device must NAK the request (*not stall*)
@@ -217,18 +222,18 @@ bool tud_usbtmc_msgBulkIn_request_cb(usbtmc_msg_request_dev_dep_in const * reque
 
 void usbtmc_app_task_iter(void) {
   switch(queryState) {
-  case 0: // no query
+  case no_query:
     break;
-  case 1: // query
-    queryState = 2;
+  case queried:
+    queryState = ready_to_transmit;
     break;
   case 2: // time to transmit;
     if(bulkInStarted &&  (buffer_tx_ix == 0)) {
       if(reply_len) // if this was a SCPI query, there will be a reply.
       {
         tud_usbtmc_transmit_dev_msg_data(reply,  tu_min32(reply_len,msgReqLen),true,false);
-        queryState = 0;
-        bulkInStarted = 0;
+        queryState = no_query;
+        bulkInStarted = false;
         reply_len = 0;
       }
       else
@@ -238,8 +243,8 @@ void usbtmc_app_task_iter(void) {
       }
       // MAV is cleared in the transfer complete callback.
     }
-    if((queryState == 2) && (!reply_len)) { // we didn't get a reply from SCPI lib
-      queryState = 0; // if the lib didn't reply, it means the scpi sentence didn't generate one
+    if((queryState == ready_to_transmit) && (!reply_len)) { // we didn't get a reply from SCPI lib
+      queryState = no_query; // if the lib didn't reply, it means the scpi sentence didn't generate one
     }
 
     break;
@@ -252,7 +257,7 @@ void usbtmc_app_task_iter(void) {
 bool tud_usbtmc_initiate_clear_cb(uint8_t *tmcResult)
 {
   *tmcResult = USBTMC_STATUS_SUCCESS;
-  queryState = 0;
+  queryState = no_query;
   bulkInStarted = false;
   uint8_t status = getSTB();
   status = 0;
@@ -262,7 +267,7 @@ bool tud_usbtmc_initiate_clear_cb(uint8_t *tmcResult)
 
 bool tud_usbtmc_check_clear_cb(usbtmc_get_clear_status_rsp_t *rsp)
 {
-  queryState = 0;
+  queryState = no_query;
   bulkInStarted = false;
   uint8_t status = getSTB();
   status = 0;
@@ -275,7 +280,7 @@ bool tud_usbtmc_check_clear_cb(usbtmc_get_clear_status_rsp_t *rsp)
 }
 bool tud_usbtmc_initiate_abort_bulk_in_cb(uint8_t *tmcResult)
 {
-  bulkInStarted = 0;
+  bulkInStarted = false;
   *tmcResult = USBTMC_STATUS_SUCCESS;
   return true;
 }
@@ -316,7 +321,6 @@ uint8_t tud_usbtmc_get_stb_cb(uint8_t *tmcResult)
   setSTB(status);
 
   *tmcResult = USBTMC_STATUS_SUCCESS;
-  // Increment status so that we see different results on each read...
 
   return old_status;
 }
@@ -346,9 +350,5 @@ void setReply (const char *data, size_t len) {
 
 void setControlReply () {
   // TODO find how to support service request calls 
-/*   reply[0] = 0x81;
-  reply[1] = getSTB();
-  reply_len = 2;
-  // queryState = 1; nah */
 }
 
