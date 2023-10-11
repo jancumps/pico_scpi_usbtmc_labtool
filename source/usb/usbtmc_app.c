@@ -30,8 +30,6 @@
 #include "main.h"
 
 #include "scpi-def.h"
-//#include "usbtmc_patch.h"
-
 
 #if (CFG_TUD_USBTMC_ENABLE_488)
 static usbtmc_response_capabilities_488_t const
@@ -348,58 +346,6 @@ void setReply (const char *data, size_t len) {
   memcpy(reply + (reply_len * sizeof reply[0]), data, len);
   reply_len += len;
 }
-
-#ifdef USE_LOCAL_TUSB_HACK
-extern bool usbd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes);
-extern bool usbd_edpt_busy(uint8_t rhport, uint8_t ep_addr);
-
-typedef struct {
-  uint8_t ep_int_in;
-  uint8_t rhport;
-} usbtmc_interface_state_t;
-
-//extern usbtmc_interface_state_t usbtmc_state;
-static usbtmc_interface_state_t usbtmc_state_ =
-{
-    .rhport = 0,
-    .ep_int_in = 129
-};
-
-bool tud_usbtmc_send_srq(void) 
-{
-  usbtmc_read_stb_rsp_488_t rsp;
-  
-  rsp.bTag = 0x01; //Indicates SRQ
-  if(usbtmc_state_.ep_int_in != 0)
-  {
-    rsp.statusByte = 0x00; // Use interrupt endpoint, instead. Must be 0x00 (USB488v1.0 4.3.1.2)
-    if(usbd_edpt_busy(usbtmc_state_.rhport, usbtmc_state_.ep_int_in))
-    {
-      rsp.USBTMC_status = USB488_STATUS_INTERRUPT_IN_BUSY;
-    }
-    else
-    {
-      rsp.USBTMC_status = USBTMC_STATUS_SUCCESS;
-      usbtmc_read_stb_interrupt_488_t intMsg =
-      {
-        .bNotify1 = {
-            .one = 1,
-            .bTag = 0x01 //Indicates SRQ
-        },
-        .StatusByte = tud_usbtmc_get_stb_cb(&(rsp.USBTMC_status))
-      };
-      // Must be queued before control request response sent (USB488v1.0 4.3.1.2)
-      usbd_edpt_xfer(usbtmc_state_.rhport, usbtmc_state_.ep_int_in, (void*)&intMsg, sizeof(intMsg));
-    }
-  }
-  else
-  {
-    rsp.statusByte = tud_usbtmc_get_stb_cb(&(rsp.USBTMC_status));
-  }
-  //TU_VERIFY(tud_control_xfer(usbtmc_state.rhport, request, (void*)&rsp, sizeof(rsp)));
-  return true;
-}
-#endif
 
 void setControlReply () {
   tud_usbtmc_send_srq();
