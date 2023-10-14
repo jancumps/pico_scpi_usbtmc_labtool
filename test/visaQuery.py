@@ -86,9 +86,8 @@ while i < len(reslist):
 	inst.write("*CLS")
 	inst.write("*SRE 128") #leaving Bit6 MSS - off
 	
-	print('Done setting up')
+	print('Done setting up. Drive DIGI:INP0 low (push button connected to GP27)')
 	   
-	cv = 0
 	
 	try:
 		while not inst.called:
