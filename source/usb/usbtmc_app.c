@@ -31,7 +31,6 @@
 
 #include "scpi-def.h"
 
-
 #if (CFG_TUD_USBTMC_ENABLE_488)
 static usbtmc_response_capabilities_488_t const
 #else
@@ -349,6 +348,5 @@ void setReply (const char *data, size_t len) {
 }
 
 void setControlReply () {
-  // TODO find how to support service request calls 
+  tud_usbtmc_send_srq();
 }
-
