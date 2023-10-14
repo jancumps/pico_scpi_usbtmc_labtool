@@ -58,7 +58,8 @@ while i < len(reslist):
 	inst.timeout = 3000
 	inst.clear()
 
-	print("+ IDN")
+	print("Basis test")
+	print("IDN")
 	if(test_idn()):
 		print("Instrument found")
 		# reset
@@ -69,9 +70,9 @@ while i < len(reslist):
 			test_pin(j)
 			j += 1
 	print("SCPI errors during test: "+ inst.query("SYST:ERR:COUNT?"))
-	print("Basis Test complete")
+	print("Basis test complete")
 
-	print("Experimental test")
+	print("Service Request test")
 	inst.called = False
 	event_type = constants.EventType.service_request
 	event_mech = constants.EventMechanism.handler
