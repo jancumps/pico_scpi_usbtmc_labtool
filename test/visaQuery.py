@@ -40,6 +40,7 @@ def test_pin(pin):
 
 def handle_event(resource, event, user_handle):
 	print(f"Handled event {event.event_type} on {resource}")
+	resource.called = True
 	stb = inst.read_stb()
 	inst.write("*CLS")
 
