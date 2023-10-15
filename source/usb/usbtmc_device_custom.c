@@ -4,9 +4,9 @@
 
 // TODO remove this USBTMC customisation once TinyUSB supports send srq
 #if (CFG_TUD_USBTMC_ENABLE_488)
-// I based this based on the PICO definition in tusb_config.h
+// I based this on the PICO definition in tusb_config.h
 #define PATCH_usbtmc_state_rhport (BOARD_TUD_RHPORT)
-// I based this based on the PICO definition in usb_descriptors.c
+// I based this on the PICO definition in usb_descriptors.c
 #define PATCH_usbtmc_state_ep_int_in (0x82)
 bool tud_usbtmc_send_srq(void) 
   {
