@@ -50,6 +50,8 @@
 #include <string.h>
 #include "scpi-def.h"
 
+#include "registers/registers.h"
+
 #include "gpio_utils.h"
 #include "adc_utils.h"
 #include "i2c_utils.h"
@@ -189,95 +191,8 @@ static scpi_result_t SCPI_AnalogOutputQ(scpi_t * context) {
 }
 
 
-scpi_result_t SCPI_ReadReg(scpi_t * context, scpi_reg_name_t name) {
-    /* return value */
-    SCPI_ResultInt32(context, SCPI_RegGet(context, name));
 
-    /* clear register */
-    SCPI_RegSet(context, name, 0);
 
-    return SCPI_RES_OK;
-}
-
-scpi_result_t SCPI_WriteReg(scpi_t * context, scpi_reg_name_t name) {
-    int32_t new_OPERE;
-    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
-        SCPI_RegSet(context, name, (scpi_reg_val_t) new_OPERE);
-    }
-    return SCPI_RES_OK;
-}
-
-/**
- * STATus:OPERation:DIGItal:INPut:EVENt?
- * @param context
- * @return
- */
-scpi_result_t SCPI_StatusOperationDigitalInputEventQ(scpi_t * context) {
-    return SCPI_ReadReg(context, USER_REG_DIGINEVENT);
-}
-
-/**
- * STATus:OPERation:DIGItal:INPut:CONDition?
- * @param context
- * @return
- */
-scpi_result_t SCPI_StatusOperationDigitalInputConditionQ(scpi_t * context) {
-    return SCPI_ReadReg(context, USER_REG_DIGINEVENTC);
-}
-
-/**
- * STATus:OPERation:DIGItal:INPut:ENABle
- * @param context
- * @return
- */
-scpi_result_t SCPI_StatusOperationDigitalInputEnable(scpi_t * context) {
-    return SCPI_WriteReg(context, USER_REG_DIGINEVENTE);
-}
-
-/**
- * STATus:OPERation:DIGItal:INPut:ENABle?
- * @param context
- * @return
- */
- scpi_result_t SCPI_StatusOperationDigitalInputEnableQ(scpi_t * context) {
-    return SCPI_ReadReg(context, USER_REG_DIGINEVENTE);
-}
-
-/**
- * STATus:OPERation:DIGItal:INPut:PTRansition
- * @param context
- * @return
- */
-scpi_result_t SCPI_StatusOperationDigitalInputPTransition(scpi_t * context) {
-    return SCPI_WriteReg(context, USER_REG_DIGINEVENTP);
-}
-
-/**
- * STATus:OPERation:DIGItal:INPut:PTRansition?
- * @param context
- * @return
- */
- scpi_result_t SCPI_StatusOperationDigitalInputPTransitionQ(scpi_t * context) {
-    return SCPI_ReadReg(context, USER_REG_DIGINEVENTP);
-}
-
-/**
- * STATus:OPERation:DIGItal:INPut:NTRansition
- * @param context
- * @return
- */
-scpi_result_t SCPI_StatusOperationDigitalInputNTransition(scpi_t * context) {
-    return SCPI_WriteReg(context, USER_REG_DIGINEVENTN);
-}
-
-/**
- * STATus:OPERation:DIGItal:INPut:NTRansition?
- * @param context
- * @return
- */
- scpi_result_t SCPI_StatusOperationDigitalInputNTransitionQ(scpi_t * context) {
-    return SCPI_ReadReg(context, USER_REG_DIGINEVENTN);
-}
 
 void triggerHandler() {
     // this function is the handler for SCPI and usbtmc trigger requests.
@@ -345,14 +260,8 @@ const scpi_command_t scpi_commands[] = {
     {.pattern = "ANAlog:OUTPut#:RAW?", .callback = SCPI_AnalogOutputQ,},
 
     // instrument specific registers commands
-    {.pattern = "STATus:OPERation:DIGItal:INPut:EVENt?", .callback = SCPI_StatusOperationDigitalInputEventQ,},
-    {.pattern = "STATus:OPERation:DIGItal:INPut:CONDition?", .callback = SCPI_StatusOperationDigitalInputConditionQ,},
-    {.pattern = "STATus:OPERation:DIGItal:INPut:ENABle", .callback = SCPI_StatusOperationDigitalInputEnable,},
-    {.pattern = "STATus:OPERation:DIGItal:INPut:ENABle?", .callback = SCPI_StatusOperationDigitalInputEnableQ,},
-    {.pattern = "STATus:OPERation:DIGItal:INPut:PTRansition", .callback = SCPI_StatusOperationDigitalInputPTransition,},
-    {.pattern = "STATus:OPERation:DIGItal:INPut:PTRansition?", .callback = SCPI_StatusOperationDigitalInputPTransitionQ,},
-    {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition", .callback = SCPI_StatusOperationDigitalInputNTransition,},
-    {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition?", .callback = SCPI_StatusOperationDigitalInputNTransitionQ,},
+    INSTRUMENT_SPECIFIC_REGISTERS
+
 
     // VISA commands
     // support VISA ASSERT TRIGGER 

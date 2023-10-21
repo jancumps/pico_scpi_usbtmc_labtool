@@ -4,16 +4,16 @@
 
 // TODO remove this USBTMC customisation once TinyUSB supports send srq
 #if (CFG_TUD_USBTMC_ENABLE_488)
-// TODO I hardcoded this based on the PICO definition in tusb_config.h
+// I based this on the PICO definition in tusb_config.h
 #define PATCH_usbtmc_state_rhport (BOARD_TUD_RHPORT)
-// TODO I hardcoded this based on the PICO definition in usb_descriptors.c
+// I based this on the PICO definition in usb_descriptors.c
 #define PATCH_usbtmc_state_ep_int_in (0x82)
 bool tud_usbtmc_send_srq(void) 
   {
     usbtmc_read_stb_rsp_488_t rsp;
     
     rsp.bTag = 0x01; //Indicates SRQ
-    if (true)  // TODO validate: (usbtmc_state.ep_int_in != 0)
+    if (PATCH_usbtmc_state_ep_int_in != 0)  // see patch defines above
     {
       rsp.statusByte = 0x00; // Use interrupt endpoint, instead. Must be 0x00 (USB488v1.0 4.3.1.2)
       // if(usbd_edpt_busy(usbtmc_state.rhport, usbtmc_state.ep_int_in))
