@@ -27,7 +27,8 @@
 #include <stdlib.h>     /* atoi */
 #include "tusb.h"
 #include "bsp/board.h"
-#include "main.h"
+
+#include "usb/usb_utils.h"
 
 #include "usbtmc_device_custom.h"
 #include "scpi-def.h"

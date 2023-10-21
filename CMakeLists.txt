@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.17)
 
 # set(PICO_DEOPTIMIZED_DEBUG 1)
 
@@ -17,6 +17,16 @@ endif ()
 
 
 pico_sdk_init()
+
+# include(FetchContent)
+# FetchContent_Declare(
+#         pico_scpi_usbtmc_lablib
+#         GIT_REPOSITORY https://github.com/jancumps/pico_scpi_usbtmc_lablib.git
+#         GIT_TAG master
+#         GIT_SUBMODULES_RECURSE FALSE
+# )
+# message("Downloading PICO SCPI USBTMC Lab Lib")
+# FetchContent_Populate(pico_scpi_usbtmc_lablib)
 
 pico_add_subdirectory(pico_scpi_usbtmc_lablib)
 
