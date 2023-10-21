@@ -63,55 +63,6 @@
 
 void initInstrument();
 
-static scpi_result_t SCPI_DigitalOutput(scpi_t * context) {
-  scpi_bool_t param1;
-  int32_t numbers[1];
-
-  // retrieve the output index
-  SCPI_CommandNumbers(context, numbers, 1, 0);
-  if (! ((numbers[0] > -1) && (numbers[0] < outPinCount()))) {
-    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
-    return SCPI_RES_ERR;
-  }
-
-  /* read first parameter if present */
-  if (!SCPI_ParamBool(context, &param1, TRUE)) {
-    return SCPI_RES_ERR;
-  }
-
-  setOutPinAt(numbers[0], param1 ? true : false);
-
-  return SCPI_RES_OK;
-}
-
-static scpi_result_t SCPI_DigitalOutputQ(scpi_t * context) {
-  int32_t numbers[1];
-
-  // retrieve the output index
-  SCPI_CommandNumbers(context, numbers, 1, 0);
-  if (! ((numbers[0] > -1) && (numbers[0] < outPinCount()))) {
-    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
-    return SCPI_RES_ERR;
-  }
-
-  SCPI_ResultBool(context, isOutPinAt(numbers[0]));
-  return SCPI_RES_OK;
-}
-
-static scpi_result_t SCPI_DigitalInputQ(scpi_t * context) {
-  int32_t numbers[1];
-
-  // retrieve the output index
-  SCPI_CommandNumbers(context, numbers, 1, 0);
-  if (! ((numbers[0] > -1) && (numbers[0] < inPinCount()))) {
-    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
-    return SCPI_RES_ERR;
-  }
-
-  SCPI_ResultBool(context, isInPinAt(numbers[0]));
-  return SCPI_RES_OK;
-}
-
 static scpi_result_t SCPI_AnalogInputQ(scpi_t * context) {
   int32_t numbers[1];
 
@@ -205,9 +156,8 @@ const scpi_command_t scpi_commands[] = {
     SCPI_BASE_COMMANDS
 
     /* custom commands for the switch */
-    {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
-    {.pattern = "DIGItal:OUTPut#?", .callback = SCPI_DigitalOutputQ,},
-    {.pattern = "DIGItal:INPut#?", .callback = SCPI_DigitalInputQ,},
+    INSTRUMENT_DIGI_OUTP_COMMANDS
+    INSTRUMENT_DIGI_INP_COMMANDS
     // adc commands
     {.pattern = "ANAlog:INPut#:RAW?", .callback = SCPI_AnalogInputQ,},
     {.pattern = "ANAlog:HIRES:INPut#:RAW?", .callback = SCPI_Analog16InputQ,},

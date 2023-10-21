@@ -50,3 +50,53 @@ bool isOutPinAt(uint32_t index) {
 bool isInPinAt(uint32_t index) {
     return gpio_get(inPins[index]);
 }
+
+scpi_result_t SCPI_DigitalOutput(scpi_t * context) {
+  scpi_bool_t param1;
+  int32_t numbers[1];
+
+  // retrieve the output index
+  SCPI_CommandNumbers(context, numbers, 1, 0);
+  if (! ((numbers[0] > -1) && (numbers[0] < outPinCount()))) {
+    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+    return SCPI_RES_ERR;
+  }
+
+  /* read first parameter if present */
+  if (!SCPI_ParamBool(context, &param1, TRUE)) {
+    return SCPI_RES_ERR;
+  }
+
+  setOutPinAt(numbers[0], param1 ? true : false);
+
+  return SCPI_RES_OK;
+}
+
+scpi_result_t SCPI_DigitalOutputQ(scpi_t * context) {
+  int32_t numbers[1];
+
+  // retrieve the output index
+  SCPI_CommandNumbers(context, numbers, 1, 0);
+  if (! ((numbers[0] > -1) && (numbers[0] < outPinCount()))) {
+    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+    return SCPI_RES_ERR;
+  }
+
+  SCPI_ResultBool(context, isOutPinAt(numbers[0]));
+  return SCPI_RES_OK;
+}
+
+scpi_result_t SCPI_DigitalInputQ(scpi_t * context) {
+  int32_t numbers[1];
+
+  // retrieve the output index
+  SCPI_CommandNumbers(context, numbers, 1, 0);
+  if (! ((numbers[0] > -1) && (numbers[0] < inPinCount()))) {
+    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+    return SCPI_RES_ERR;
+  }
+
+  SCPI_ResultBool(context, isInPinAt(numbers[0]));
+  return SCPI_RES_OK;
+}
+
