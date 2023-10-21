@@ -15,13 +15,18 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(PICO_DEOPTIMIZED_DEBUG=1)
 endif ()
 
+
 pico_sdk_init()
+
+pico_add_subdirectory(pico_scpi_usbtmc_lablib)
 
 add_compile_options(-Wall
         -Wno-format          # int != int32_t as far as the compiler is concerned because gcc has int32_t as long int
         -Wno-unused-function 
         -Wno-maybe-uninitialized
         )
+
+
 
 add_executable(pico_scpi_usbtmc_labtool
         ${CMAKE_CURRENT_SOURCE_DIR}/source/main.c
@@ -57,7 +62,10 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
         $ENV{SCPI_LIB_PATH}/inc
 )
 
-target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c pico_unique_id)
+target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib 
+        tinyusb_device tinyusb_board hardware_gpio hardware_adc 
+        hardware_pwm hardware_i2c pico_unique_id
+        pico_scpi_usbtmc_lablib)
 
 pico_set_linker_script(pico_scpi_usbtmc_labtool ${CMAKE_SOURCE_DIR}/memmap_custom.ld)
 
