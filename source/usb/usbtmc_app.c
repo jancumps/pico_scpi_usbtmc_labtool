@@ -32,6 +32,7 @@
 
 #include "usb/usbtmc_device_custom.h"
 #include "scpi-def.h"
+#include "scpi/scpi_base.h"
 
 #if (CFG_TUD_USBTMC_ENABLE_488)
 static usbtmc_response_capabilities_488_t const

@@ -127,30 +127,6 @@ static scpi_result_t SCPI_AnalogOutputQ(scpi_t * context) {
     return SCPI_RES_OK;
 }
 
-
-
-
-
-void triggerHandler() {
-    // this function is the handler for SCPI and usbtmc trigger requests.
-    // current firmware ignores triggers
-    // if there is a use for it, move this to the dedicated module
-    return;
-}
-
-/**
- * *TRG - This command asserts trigger. 
- *        https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/functions/visa-assert-trigger.html
- *        throw SCPI error, because not implemented
- * @param context
- * @return 
- */
-scpi_result_t SCPI_VisaTrg(scpi_t * context) {
-    triggerHandler();
-    SCPI_ErrorPush(context, SCPI_ERROR_UNDEFINED_HEADER); // TODO: remove when trigger implemented
-    return SCPI_RES_ERR; // TODO: return OK when trigger implemented
-}
-
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
     SCPI_BASE_COMMANDS
@@ -169,10 +145,6 @@ const scpi_command_t scpi_commands[] = {
     INSTRUMENT_SPECIFIC_REGISTERS
 
 
-    // VISA commands
-    // support VISA ASSERT TRIGGER 
-    // https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/functions/visa-assert-trigger.html
-    { .pattern = "*TRG", .callback = SCPI_VisaTrg,},
 
     SCPI_CMD_LIST_END
 };
@@ -207,9 +179,7 @@ void scpi_instrument_init() {
 
 }
 
-scpi_bool_t scpi_instrument_input(const char * data, int len) {
-    return SCPI_Input(&scpi_context, data, len);
-}
+
 
 /*
  * The SCPI lib calls this function to write data back over the SCI2 interface
@@ -246,10 +216,6 @@ uint8_t getSTB() {
 
 void setSTB(uint8_t stb) {
     SCPI_RegSet(&scpi_context, SCPI_REG_STB, (scpi_reg_val_t) stb);    
-}
-
-void doTrigger() {
-    triggerHandler();
 }
 
 void initInstrument() {
