@@ -51,6 +51,7 @@
 #include "scpi-def.h"
 
 #include "registers/registers.h"
+#include "scpi/scpi_base.h"
 
 #include "gpio_utils.h"
 #include "adc_utils.h"
@@ -61,21 +62,6 @@
 #include "usbtmc_app.h"
 
 void initInstrument();
-
-/**
- * Reimplement IEEE488.2 *TST?
- *
- * Result should be 0 if everything is ok
- * Result should be 1 if something goes wrong
- *
- * Return SCPI_RES_OK
- */
-static scpi_result_t My_CoreTstQ(scpi_t * context) {
-
-    SCPI_ResultInt32(context, 0);
-
-    return SCPI_RES_OK;
-}
 
 static scpi_result_t SCPI_DigitalOutput(scpi_t * context) {
   scpi_bool_t param1;
@@ -216,37 +202,7 @@ scpi_result_t SCPI_VisaTrg(scpi_t * context) {
 
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
-    { .pattern = "*CLS", .callback = SCPI_CoreCls,},
-    { .pattern = "*ESE", .callback = SCPI_CoreEse,},
-    { .pattern = "*ESE?", .callback = SCPI_CoreEseQ,},
-    { .pattern = "*ESR?", .callback = SCPI_CoreEsrQ,},
-    { .pattern = "*IDN?", .callback = SCPI_CoreIdnQ,},
-    { .pattern = "*OPC", .callback = SCPI_CoreOpc,},
-    { .pattern = "*OPC?", .callback = SCPI_CoreOpcQ,},
-    { .pattern = "*RST", .callback = SCPI_CoreRst,},
-    { .pattern = "*SRE", .callback = SCPI_CoreSre,},
-    { .pattern = "*SRE?", .callback = SCPI_CoreSreQ,},
-    { .pattern = "*STB?", .callback = SCPI_CoreStbQ,},
-    { .pattern = "*TST?", .callback = My_CoreTstQ,},
-    { .pattern = "*WAI", .callback = SCPI_CoreWai,},
-
-    /* Required SCPI commands (SCPI std V1999.0 4.2.1) */
-    {.pattern = "SYSTem:ERRor[:NEXT]?", .callback = SCPI_SystemErrorNextQ,},
-    {.pattern = "SYSTem:ERRor:COUNt?", .callback = SCPI_SystemErrorCountQ,},
-    {.pattern = "SYSTem:VERSion?", .callback = SCPI_SystemVersionQ,},
-
-
-    {.pattern = "STATus:OPERation:EVENt?", .callback = SCPI_StatusOperationEventQ,},
-    {.pattern = "STATus:OPERation:CONDition?", .callback = SCPI_StatusOperationConditionQ,},
-    {.pattern = "STATus:OPERation:ENABle", .callback = SCPI_StatusOperationEnable,},
-    {.pattern = "STATus:OPERation:ENABle?", .callback = SCPI_StatusOperationEnableQ,},
-
-    {.pattern = "STATus:QUEStionable[:EVENt]?", .callback = SCPI_StatusQuestionableEventQ,},
-    /* {.pattern = "STATus:QUEStionable:CONDition?", .callback = scpi_stub_callback,}, */
-    {.pattern = "STATus:QUEStionable:ENABle", .callback = SCPI_StatusQuestionableEnable,},
-    {.pattern = "STATus:QUEStionable:ENABle?", .callback = SCPI_StatusQuestionableEnableQ,},
-
-    {.pattern = "STATus:PRESet", .callback = SCPI_StatusPreset,},
+    SCPI_BASE_COMMANDS
 
     /* custom commands for the switch */
     {.pattern = "DIGItal:OUTPut#", .callback = SCPI_DigitalOutput,},
