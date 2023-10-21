@@ -30,7 +30,7 @@
 
 #include "usb/usb_utils.h"
 
-#include "usbtmc_device_custom.h"
+#include "usb/usbtmc_device_custom.h"
 #include "scpi-def.h"
 
 #if (CFG_TUD_USBTMC_ENABLE_488)

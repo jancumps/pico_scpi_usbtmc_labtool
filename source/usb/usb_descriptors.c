@@ -25,7 +25,7 @@
 
 #include "tusb.h"
 #include "class/usbtmc/usbtmc.h"
-#include "usbtmc_device_custom.h"
+#include "usb/usbtmc_device_custom.h"
 
 #include "pico/unique_id.h"
 
