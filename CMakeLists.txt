@@ -41,7 +41,6 @@ add_compile_options(-Wall
 add_executable(pico_scpi_usbtmc_labtool
         ${CMAKE_CURRENT_SOURCE_DIR}/source/main.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/usb/usb_descriptors.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/source/usb/usbtmc_app.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/scpi/scpi-def.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/scpi/registers/registers.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/gpio/gpio_utils.c

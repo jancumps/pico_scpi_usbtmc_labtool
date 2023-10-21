@@ -1,22 +1,5 @@
 #include "registers.h"
-
-scpi_result_t SCPI_WriteReg(scpi_t * context, scpi_reg_name_t name) {
-    int32_t new_OPERE;
-    if (SCPI_ParamInt32(context, &new_OPERE, TRUE)) {
-        SCPI_RegSet(context, name, (scpi_reg_val_t) new_OPERE);
-    }
-    return SCPI_RES_OK;
-}
-
-scpi_result_t SCPI_ReadReg(scpi_t * context, scpi_reg_name_t name) {
-    /* return value */
-    SCPI_ResultInt32(context, SCPI_RegGet(context, name));
-
-    /* clear register */
-    SCPI_RegSet(context, name, 0);
-
-    return SCPI_RES_OK;
-}
+#include "scpi/scpi_base.h"
 
 /**
  * STATus:OPERation:DIGItal:INPut:EVENt?

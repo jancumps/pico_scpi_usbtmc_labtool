@@ -125,3 +125,18 @@ uint16_t getAdc16PinAt(uint32_t index) {
     // no need to start another conversion, since we are in continuous conversion mode
     return(res);
 }
+
+scpi_result_t SCPI_Analog16InputQ(scpi_t * context) {
+    int32_t numbers[1];
+
+    // retrieve the adc index
+    SCPI_CommandNumbers(context, numbers, 1, 0);
+    if (! ((numbers[0] > -1) && (numbers[0] < adc16PinCount()))) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt16(context, getAdc16PinAt(numbers[0]));
+    return SCPI_RES_OK;
+}
+

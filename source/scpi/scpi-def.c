@@ -43,8 +43,6 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,164 +57,25 @@
 #include "adc16_utils.h"
 #include "pwm_utils.h"
 
-#include "usbtmc_app.h"
-
-void initInstrument();
-
-static scpi_result_t SCPI_AnalogInputQ(scpi_t * context) {
-  int32_t numbers[1];
-
-  // retrieve the adc index
-  SCPI_CommandNumbers(context, numbers, 1, 0);
-  if (! ((numbers[0] > -1) && (numbers[0] < adcPinCount()))) {
-    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
-    return SCPI_RES_ERR;
-  }
-
-  SCPI_ResultUInt16(context, getAdcPinAt(numbers[0]));
-  return SCPI_RES_OK;
-}
-
-static scpi_result_t SCPI_Analog16InputQ(scpi_t * context) {
-    int32_t numbers[1];
-
-    // retrieve the adc index
-    SCPI_CommandNumbers(context, numbers, 1, 0);
-    if (! ((numbers[0] > -1) && (numbers[0] < adc16PinCount()))) {
-        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
-        return SCPI_RES_ERR;
-    }
-
-    SCPI_ResultUInt16(context, getAdc16PinAt(numbers[0]));
-    return SCPI_RES_OK;
-}
-
-// PWM
-static scpi_result_t SCPI_AnalogOutput(scpi_t * context) {
-    int32_t param1;
-    int32_t numbers[1];
-
-    // retrieve the output index
-    SCPI_CommandNumbers(context, numbers, 1, 0);
-    if (! ((numbers[0] > -1) && (numbers[0] < pwmPinCount()))) {
-        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
-        return SCPI_RES_ERR;
-    }
-
-    /* read first parameter if present */
-    if (!SCPI_ParamInt32(context, &param1, TRUE)) {
-        return SCPI_RES_ERR;
-    }
-
-    setPwmPinAt(numbers[0], param1);
-
-    return SCPI_RES_OK;
-}
-
-static scpi_result_t SCPI_AnalogOutputQ(scpi_t * context) {
-    int32_t numbers[1];
-
-    // retrieve the pwm index
-    SCPI_CommandNumbers(context, numbers, 1, 0);
-    if (! ((numbers[0] > -1) && (numbers[0] < pwmPinCount()))) {
-        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
-        return SCPI_RES_ERR;
-    }
-
-    SCPI_ResultUInt16(context, getPwmPinAt(numbers[0]));
-    return SCPI_RES_OK;
-}
-
 const scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
     SCPI_BASE_COMMANDS
 
     /* custom commands for the switch */
+    // gpio commands
     INSTRUMENT_DIGI_OUTP_COMMANDS
     INSTRUMENT_DIGI_INP_COMMANDS
     // adc commands
-    {.pattern = "ANAlog:INPut#:RAW?", .callback = SCPI_AnalogInputQ,},
-    {.pattern = "ANAlog:HIRES:INPut#:RAW?", .callback = SCPI_Analog16InputQ,},
+    INSTRUMENT_ANA_INP_COMMANDS
+    INSTRUMENT_ANA_HIRES_INP_COMMANDS
     // pwm commands
-    {.pattern = "ANAlog:OUTPut#:RAW", .callback = SCPI_AnalogOutput,},
-    {.pattern = "ANAlog:OUTPut#:RAW?", .callback = SCPI_AnalogOutputQ,},
+    INSTRUMENT_ANA_OUTP_COMMANDS
 
     // instrument specific registers commands
     INSTRUMENT_SPECIFIC_REGISTERS
 
-
-
     SCPI_CMD_LIST_END
 };
-
-scpi_interface_t scpi_interface = {
-    .error = NULL,            // haven't implemented an error logger
-    .write = SCPI_Write,
-    .control = SCPI_Control,
-    .flush = NULL,            // don't need flush for SCI / USB
-    .reset = SCPI_Reset,
-};
-
-char scpi_input_buffer[SCPI_INPUT_BUFFER_LENGTH];
-scpi_error_t scpi_error_queue_data[SCPI_ERROR_QUEUE_SIZE];
-
-scpi_t scpi_context;
-
-
-// init helper for this instrument
-void scpi_instrument_init() {
-    initInstrument(); // if you prefer no dependency on the gpio_utils in main,
-              // you could move this call into the scpi_instrument_init() body.
-              // like I did here
-    
-     SCPI_Init(&scpi_context,
-             scpi_commands,
-             &scpi_interface,
-             scpi_units_def,
-             SCPI_IDN1, SCPI_IDN2, SCPI_IDN3, SCPI_IDN4,
-             scpi_input_buffer, SCPI_INPUT_BUFFER_LENGTH,
-             scpi_error_queue_data, SCPI_ERROR_QUEUE_SIZE);
-
-}
-
-
-
-/*
- * The SCPI lib calls this function to write data back over the SCI2 interface
- * visual clue: dim user LED B after delivering the reply
- */
-size_t SCPI_Write(scpi_t * context, const char * data, size_t len) {
-    (void) context;
-
-  setReply(data, len);
-
-    return len;
-}
-
-scpi_result_t SCPI_Reset(scpi_t * context) {
-    (void) context;
-    initInstrument();
-    return SCPI_RES_OK;   
-}
-
-scpi_result_t SCPI_Control(scpi_t* context, scpi_ctrl_name_t ctrl, scpi_reg_val_t val)
-{
-    (void)context;
-    (void) val;
-
-    if (SCPI_CTRL_SRQ == ctrl) {
-        setControlReply();
-    }
-    return SCPI_RES_OK;
-}
-
-uint8_t getSTB() {
-    return (uint8_t) SCPI_RegGet(&scpi_context, SCPI_REG_STB);
-}
-
-void setSTB(uint8_t stb) {
-    SCPI_RegSet(&scpi_context, SCPI_REG_STB, (scpi_reg_val_t) stb);    
-}
 
 void initInstrument() {
     initGpioUtils();
@@ -239,7 +98,7 @@ void maintainDigiInReg() {
       int j = isInPinAt(i) << i;      
       digi_in |= j ;
     }
-    SCPI_RegSet(&scpi_context, USER_REG_DIGINEVENTC, digi_in);
+    SCPI_RegSet(getScpiContext(), USER_REG_DIGINEVENTC, digi_in);
 }
 
 void maintainInstrumentRegs() {

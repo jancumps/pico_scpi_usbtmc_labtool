@@ -29,11 +29,12 @@
 
 #include "bsp/board.h"
 #include "tusb.h"
-#include "usbtmc_app.h"
+#include "usb/usbtmc_app.h"
 
 #include "usb/usb_utils.h"
 
 #include "scpi-def.h"
+#include "scpi/scpi_base.h"
 
 
 /*------------- MAIN -------------*/
