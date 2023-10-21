@@ -31,6 +31,8 @@
 #include "tusb.h"
 #include "usbtmc_app.h"
 
+#include "usb/usb_utils.h"
+
 #include "scpi-def.h"
 
 
