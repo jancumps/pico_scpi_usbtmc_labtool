@@ -13,9 +13,6 @@
     {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition", .callback = SCPI_StatusOperationDigitalInputNTransition,}, \
     {.pattern = "STATus:OPERation:DIGItal:INPut:NTRansition?", .callback = SCPI_StatusOperationDigitalInputNTransitionQ,},
 
-scpi_result_t SCPI_WriteReg(scpi_t * context, scpi_reg_name_t name);
-scpi_result_t SCPI_StatusOperationDigitalInputEventQ(scpi_t * context);
-
 scpi_result_t SCPI_StatusOperationDigitalInputEventQ(scpi_t * context);
 scpi_result_t SCPI_StatusOperationDigitalInputConditionQ(scpi_t * context);
 scpi_result_t SCPI_StatusOperationDigitalInputEnable(scpi_t * context);

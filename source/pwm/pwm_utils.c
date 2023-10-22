@@ -82,3 +82,38 @@ void setPwmPinAt(uint32_t index, uint32_t value)  {
 uint16_t getPwmPinAt(uint32_t index) {
     return(pwm_level[index]);
 }
+
+scpi_result_t SCPI_AnalogOutput(scpi_t * context) {
+    int32_t param1;
+    int32_t numbers[1];
+
+    // retrieve the output index
+    SCPI_CommandNumbers(context, numbers, 1, 0);
+    if (! ((numbers[0] > -1) && (numbers[0] < pwmPinCount()))) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+        return SCPI_RES_ERR;
+    }
+
+    /* read first parameter if present */
+    if (!SCPI_ParamInt32(context, &param1, TRUE)) {
+        return SCPI_RES_ERR;
+    }
+
+    setPwmPinAt(numbers[0], param1);
+
+    return SCPI_RES_OK;
+}
+
+scpi_result_t SCPI_AnalogOutputQ(scpi_t * context) {
+    int32_t numbers[1];
+
+    // retrieve the pwm index
+    SCPI_CommandNumbers(context, numbers, 1, 0);
+    if (! ((numbers[0] > -1) && (numbers[0] < pwmPinCount()))) {
+        SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+        return SCPI_RES_ERR;
+    }
+
+    SCPI_ResultUInt16(context, getPwmPinAt(numbers[0]));
+    return SCPI_RES_OK;
+}

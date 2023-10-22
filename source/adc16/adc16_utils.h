@@ -3,8 +3,13 @@
 
 /********** includes **********/
 #include "pico/stdlib.h"
+#include "scpi/scpi.h"
 
 /******* defines *********************/
+
+#define INSTRUMENT_ANA_HIRES_INP_COMMANDS \
+    {.pattern = "ANAlog:HIRES:INPut#:RAW?", .callback = SCPI_Analog16InputQ,},
+
 // ADS1115 ADDR pin set to 0V results in I2C address 0x48
 #define ADS_ADDR 0x48
 // ADS1115 registers (4)
@@ -24,5 +29,9 @@
 void initAdc16Reg(void);
 uint32_t adc16PinCount();
 uint16_t getAdc16PinAt(uint32_t index);
+
+scpi_result_t SCPI_Analog16InputQ(scpi_t * context);
+
+
 
 #endif // _ADC16_UTILS_H
