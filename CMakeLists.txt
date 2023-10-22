@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.17)
 
 # set(PICO_DEOPTIMIZED_DEBUG 1)
 
@@ -15,7 +15,20 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(PICO_DEOPTIMIZED_DEBUG=1)
 endif ()
 
+
 pico_sdk_init()
+
+# include(FetchContent)
+# FetchContent_Declare(
+#         pico_scpi_usbtmc_lablib
+#         GIT_REPOSITORY https://github.com/jancumps/pico_scpi_usbtmc_lablib.git
+#         GIT_TAG master
+#         GIT_SUBMODULES_RECURSE FALSE
+# )
+# message("Downloading PICO SCPI USBTMC Lab Lib")
+# FetchContent_Populate(pico_scpi_usbtmc_lablib)
+
+pico_add_subdirectory(pico_scpi_usbtmc_lablib)
 
 add_compile_options(-Wall
         -Wno-format          # int != int32_t as far as the compiler is concerned because gcc has int32_t as long int
@@ -23,12 +36,13 @@ add_compile_options(-Wall
         -Wno-maybe-uninitialized
         )
 
+
+
 add_executable(pico_scpi_usbtmc_labtool
         ${CMAKE_CURRENT_SOURCE_DIR}/source/main.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/usb/usb_descriptors.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/source/usb/usbtmc_app.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/source/usb/usbtmc_device_custom.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/scpi/scpi-def.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/source/scpi/registers/registers.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/gpio/gpio_utils.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/adc/adc_utils.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/i2c/i2c_utils.c
@@ -56,7 +70,10 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
         $ENV{SCPI_LIB_PATH}/inc
 )
 
-target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib tinyusb_device tinyusb_board hardware_gpio hardware_adc hardware_pwm hardware_i2c pico_unique_id)
+target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib 
+        tinyusb_device tinyusb_board hardware_gpio hardware_adc 
+        hardware_pwm hardware_i2c pico_unique_id
+        pico_scpi_usbtmc_lablib)
 
 pico_set_linker_script(pico_scpi_usbtmc_labtool ${CMAKE_SOURCE_DIR}/memmap_custom.ld)
 

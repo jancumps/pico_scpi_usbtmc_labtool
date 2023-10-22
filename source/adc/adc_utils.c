@@ -33,3 +33,17 @@ uint16_t getAdcPinAt(uint32_t index) {
       adc_select_input(adcPins[index][0]); // the ADC pin number is needed here
       return adc_read();
 }
+
+scpi_result_t SCPI_AnalogInputQ(scpi_t * context) {
+  int32_t numbers[1];
+
+  // retrieve the adc index
+  SCPI_CommandNumbers(context, numbers, 1, 0);
+  if (! ((numbers[0] > -1) && (numbers[0] < adcPinCount()))) {
+    SCPI_ErrorPush(context, SCPI_ERROR_INVALID_SUFFIX);
+    return SCPI_RES_ERR;
+  }
+
+  SCPI_ResultUInt16(context, getAdcPinAt(numbers[0]));
+  return SCPI_RES_OK;
+}
