@@ -48,14 +48,6 @@ add_executable(pico_scpi_usbtmc_labtool
         ${CMAKE_CURRENT_SOURCE_DIR}/source/i2c/i2c_utils.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/adc16/adc16_utils.c
         ${CMAKE_CURRENT_SOURCE_DIR}/source/pwm/pwm_utils.c
-        $ENV{SCPI_LIB_PATH}/src/parser.c
-        $ENV{SCPI_LIB_PATH}/src/lexer.c
-        $ENV{SCPI_LIB_PATH}/src/error.c
-        $ENV{SCPI_LIB_PATH}/src/ieee488.c
-        $ENV{SCPI_LIB_PATH}/src/minimal.c
-        $ENV{SCPI_LIB_PATH}/src/utils.c
-        $ENV{SCPI_LIB_PATH}/src/units.c
-        $ENV{SCPI_LIB_PATH}/src/fifo.c
         source/adc16/adc16_utils.c source/adc16/adc16_utils.h)
 
 target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
@@ -67,7 +59,6 @@ target_include_directories(pico_scpi_usbtmc_labtool PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/source/i2c
         ${CMAKE_CURRENT_LIST_DIR}/source/adc16
         ${CMAKE_CURRENT_LIST_DIR}/source/pwm
-        $ENV{SCPI_LIB_PATH}/inc
 )
 
 target_link_libraries(pico_scpi_usbtmc_labtool PUBLIC pico_stdlib 
