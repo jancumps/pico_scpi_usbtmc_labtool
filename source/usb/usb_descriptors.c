@@ -44,7 +44,7 @@ char const* string_desc_arr [] =
   "element14community",                     // 1: Manufacturer
   "Pico SCPI labTool",              // 2: Product
   serial,                        // 3: Serials, uses the flash ID
-  "PST",              // 4: USBTMC
+  "PST USBTMC",              // 4: USBTMC
 };
 
 static uint16_t _desc_str[32];
