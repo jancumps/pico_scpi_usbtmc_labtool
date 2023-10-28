@@ -41,10 +41,10 @@ char serial[2 * PICO_UNIQUE_BOARD_ID_SIZE_BYTES + 1];
 char const* string_desc_arr [] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-  "TinyUSB",                     // 1: Manufacturer
-  "TinyUSB Device",              // 2: Product
+  "element14community",                     // 1: Manufacturer
+  "Pico SCPI labTool",              // 2: Product
   serial,                        // 3: Serials, uses the flash ID
-  "TinyUSB USBTMC",              // 4: USBTMC
+  "PST USBTMC",              // 4: USBTMC
 };
 
 static uint16_t _desc_str[32];
