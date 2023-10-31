@@ -40,9 +40,10 @@ def test_pin(pin):
 
 def handle_event(resource, event, user_handle):
 	print(f"Handled event {event.event_type} on {resource}")
-	resource.called = True
 	stb = inst.read_stb()
+	print("status read finished")
 	inst.write("*CLS")
+	resource.called = True
 
 
 rm = visa.ResourceManager()
@@ -99,11 +100,15 @@ while i < len(reslist):
 #	   logging.exception("While looping")
 
 	try:
+		print("disabling event")
 		inst.disable_event(event_type, event_mech)
+		print("disabled event")
 	except:
 		print('err while disabling event')
 	try:
+		print("uninstalling handler")
 		inst.uninstall_handler(event_type, wrapped, user_handle)
+		print("uninstalled handler")
 	except:
 		print('err while disabling event')
 	
