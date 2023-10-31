@@ -1,6 +1,15 @@
 #ifndef _SCPI_USER_CONFIG_H
 #define _SCPI_USER_CONFIG_H
 
+// here you can override the SCPI lib default response terminator
+/* set the termination character(s)   */
+#ifndef SCPI_LINE_ENDING
+#define LINE_ENDING_CR          "\r"    /*   use a <CR> carriage return as termination charcter */
+#define LINE_ENDING_LF          "\n"    /*   use a <LF> line feed as termination charcter */
+#define LINE_ENDING_CRLF        "\r\n"  /*   use <CR><LF> carriage return + line feed as termination charcters */
+#define SCPI_LINE_ENDING        LINE_ENDING_CRLF
+#endif
+
 // define instrument specific registers
 #define USE_CUSTOM_REGISTERS 1
 
