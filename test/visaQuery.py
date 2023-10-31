@@ -15,7 +15,7 @@ def test_idn():
 	print(idn)
 
 	# check if the IDN string matches the expected pattern. Allow for different serial number
-	if(re.search("PICO-PI,LABTOOL,\d+,01.00\r\n", idn) != None):
+	if(re.search("PICO-PI,LABTOOL,([0-9a-fA-F]+),01.00\n", idn) != None):
 		isPico = (inst.is_4882_compliant)
 
 
