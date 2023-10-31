@@ -9,7 +9,7 @@
 // model
 #define SCPI_IDN2 "LABTOOL"
 // serial number
-#define SCPI_IDN3 NULL
+// pico unique id
 // version
 #define SCPI_IDN4 "01.00"
 
