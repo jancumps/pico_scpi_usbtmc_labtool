@@ -15,7 +15,7 @@ def test_idn():
 	print(idn)
 
 	# check if the IDN string matches the expected pattern. Allow for different serial number
-	if(re.search("PICO-PI,LABTOOL,\d+,01.00\r\n", idn) != None):
+	if(re.search("PICO-PI,LABTOOL,([0-9a-fA-F]+),01.00\n", idn) != None):
 		isPico = (inst.is_4882_compliant)
 
 
@@ -40,9 +40,10 @@ def test_pin(pin):
 
 def handle_event(resource, event, user_handle):
 	print(f"Handled event {event.event_type} on {resource}")
-	resource.called = True
 	stb = inst.read_stb()
+	print("status read finished")
 	inst.write("*CLS")
+	resource.called = True
 
 
 rm = visa.ResourceManager()
@@ -70,7 +71,7 @@ while i < len(reslist):
 		while j < 3:
 			test_pin(j)
 			j += 1
-	print("SCPI errors during test: "+ inst.query("SYST:ERR:COUNT?"))
+	print("SCPI errors after test: "+ inst.query("SYST:ERR:COUNT?"))
 	print("Basis test complete")
 
 	print("Service Request test")
@@ -88,26 +89,40 @@ while i < len(reslist):
 	inst.write("*CLS")
 	inst.write("*SRE 128") #leaving Bit6 MSS - off
 	
-	print('Done setting up. Drive DIGI:INP0 low (push button connected to GP27)')
+	maxloops = 500
+	sleeptime = 0.01
+	print("Done setting up. Drive DIGI:INP0 low (push button connected to GP27) within {} s".format(sleeptime * maxloops))
 	   
 	
 	try:
-		while not inst.called:
-			time.sleep(0.01)				
+		loops = 0
+		while (not inst.called) and (loops < maxloops):
+			time.sleep(sleeptime)
+			loops += 1				
+		if (loops >= maxloops):
+			print("Service request not called after {} s".format(sleeptime * loops))
 	except: 
 		inst.close()
 #	   logging.exception("While looping")
 
 	try:
+		print("disabling event")
 		inst.disable_event(event_type, event_mech)
+		print("disabled event")
 	except:
-		print('err while disabling event')
+		print("err while disabling event")
 	try:
+		print("uninstalling handler")
 		inst.uninstall_handler(event_type, wrapped, user_handle)
+		print("uninstalled handler")
 	except:
-		print('err while disabling event')
+		print("err while uninstalling handler")
 	
+	print("SCPI errors after test: "+ inst.query("SYST:ERR:COUNT?"))
+	print("Service Request test complete")
+
 	inst.close()
 	i += 1
+
 
 print("All Test complete")
