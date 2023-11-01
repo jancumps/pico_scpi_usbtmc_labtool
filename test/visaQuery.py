@@ -116,7 +116,7 @@ while i < len(reslist):
 		inst.uninstall_handler(event_type, wrapped, user_handle)
 		print("uninstalled handler")
 	except:
-		print("err while disabling event")
+		print("err while uninstalling handler")
 	
 	print("SCPI errors after test: "+ inst.query("SYST:ERR:COUNT?"))
 	print("Service Request test complete")
