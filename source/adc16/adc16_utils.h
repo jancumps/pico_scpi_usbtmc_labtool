@@ -11,7 +11,7 @@
     {.pattern = "ANAlog:HIRES:INPut#:RAW?", .callback = SCPI_Analog16InputQ,},
 
 // ADS1115 ADDR pin set to 0V results in I2C address 0x48
-#define ADS_ADDR 0x48
+#define ADS_START_ADDR 0x48
 // ADS1115 registers (4)
 #define ADS1115_REG_CONVERSION 0x00
 #define ADS1115_REG_CONFIG 0x01

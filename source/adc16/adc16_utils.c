@@ -19,30 +19,32 @@ SDA: GP4
 */
 
 /************** global vars ***************/
-uint8_t adc16Installed = 0;
 uint32_t adc16Channel = 0;
 uint8_t confreg[2]; // config register
+uint8_t ads_addr = 0;
 
 // initialize the ADS1115 registers
 void initAdc16Reg(void) {
     uint8_t buf[3];
     // is the ADC chip installed?
-    buf[0] = ADS1115_REG_CONFIG;
-    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 1, false);
-    i2c_read_blocking(i2c_default, ADS_ADDR, buf, 2, false);
-    if (buf[0] != 0x85 || buf[1] != 0x83) {
-        adc16Installed = 0; // no chip found
-        return;
-    } else {
-        adc16Installed = 1; // chip found
+    for (int i = 0; i < 2; i++) {
+        buf[0] = ADS1115_REG_CONFIG;
+        i2c_write_blocking(i2c_default, ADS_START_ADDR + i, buf, 1, false);
+        if (i2c_read_blocking(i2c_default, ADS_START_ADDR + i, buf, 2, false) != PICO_ERROR_GENERIC)         {
+            ads_addr = ADS_START_ADDR + i; // chip found
+            break;
+        }
     }
-    // set config register to desired values
-    confreg[0] = 0x44; // MUX set to AIN0, and PGA set to +-2.048V and continuous conversion mode
-    confreg[1] = 0x43; // rate = 32 SPS
-    buf[0] = ADS1115_REG_CONFIG;
-    buf[1] = confreg[0];
-    buf[2] = confreg[1];
-    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 3, false);
+
+    if (ads_addr) {
+        // set config register to desired values
+        confreg[0] = 0x44; // MUX set to AIN0, and PGA set to +-2.048V and continuous conversion mode
+        confreg[1] = 0x43; // rate = 32 SPS
+        buf[0] = ADS1115_REG_CONFIG;
+        buf[1] = confreg[0];
+        buf[2] = confreg[1];
+        i2c_write_blocking(i2c_default, ads_addr, buf, 3, false);
+    }
 }
 
 // set the multiplexer to the desired input
@@ -53,7 +55,7 @@ void setAdc16Mux(uint8_t mux) {
     buf[0] = ADS1115_REG_CONFIG;
     buf[1] = confreg[0];
     buf[2] = confreg[1];
-    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 3, false);
+    i2c_write_blocking(i2c_default, ads_addr, buf, 3, false);
 }
 
 // start a conversion (this is only for single-shot mode)
@@ -63,7 +65,7 @@ void startAdc16Conv(void) {
     buf[0] = ADS1115_REG_CONFIG;
     buf[1] = confreg[0] | 0x80; // set 'OS' bit to start a conversion
     buf[2] = confreg[1];
-    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 3, false);
+    i2c_write_blocking(i2c_default, ads_addr, buf, 3, false);
 }
 
 // check if the conversion is complete (this may only work for single-shot mode)
@@ -71,8 +73,8 @@ void startAdc16Conv(void) {
 uint8_t adc16ConvDone(void) {
     uint8_t buf[3];
     buf[0] = ADS1115_REG_CONFIG;
-    i2c_write_blocking(i2c_default, ADS_ADDR, buf, 1, false);
-    i2c_read_blocking(i2c_default, ADS_ADDR, buf, 2, false);
+    i2c_write_blocking(i2c_default, ads_addr, buf, 1, false);
+    i2c_read_blocking(i2c_default, ads_addr, buf, 2, false);
     if (buf[0] & 0x80) {
         return 0; // conversion not done
     } else {
@@ -86,8 +88,8 @@ uint16_t readAdc16Meas(void) {
     uint16_t buf;
     uint8_t* buf8_ptr = (uint8_t*)&buf;
     *buf8_ptr = ADS1115_REG_CONVERSION;
-    i2c_write_blocking(i2c_default, ADS_ADDR, buf8_ptr, 1, false);
-    i2c_read_blocking(i2c_default, ADS_ADDR, buf8_ptr, 2, false);
+    i2c_write_blocking(i2c_default, ads_addr, buf8_ptr, 1, false);
+    i2c_read_blocking(i2c_default, ads_addr, buf8_ptr, 2, false);
     meas = buf>>8 | buf<<8; // swap bytes
     if (adc16Channel < 4) {
         // we are in single-ended mode. Any integer value less than 0 is invalid
@@ -102,7 +104,7 @@ uint16_t readAdc16Meas(void) {
 
 // provide a pin count. returns 0 if the ADS1115 is not installed
 uint32_t adc16PinCount() {
-    if (adc16Installed) {
+    if (ads_addr) {
         return(4);
     } else {
         return(0);
