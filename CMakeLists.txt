@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.17)
 
 # set(PICO_DEOPTIMIZED_DEBUG 1)
 
+# uncomment if you use a different board than sdk default
+# set(PICO_BOARD pico2)
+# set(PICO_BOARD pico2_w)
+# set(PICO_BOARD seeed_xiao_rp2040)
+
 # Pull in SDK (must be before project)
 include(pico_sdk_import.cmake)
 
