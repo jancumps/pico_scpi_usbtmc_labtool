@@ -1,18 +1,45 @@
 cmake_minimum_required(VERSION 3.17)
 
-# set(PICO_DEOPTIMIZED_DEBUG 1)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmodules-ts -fcommon -fno-rtti -fno-exceptions")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(PICO_DEOPTIMIZED_DEBUG 1)
 
-# uncomment if you use a different board than sdk default
-# set(PICO_BOARD pico2)
-# set(PICO_BOARD pico2_w)
-# set(PICO_BOARD seeed_xiao_rp2040)
+# path to PICO utilities (if needed)
+if (NOT DEFINED ENV{PIOASM_DIR})
+        message("PIOASM: set PIOASM_DIR env variable if you use PIO")
+else()
+        message("PIOASM: PIOASM_DIR env variable is set to '$ENV{PIOASM_DIR}'")
+        set(pioasm_DIR $ENV{PIOASM_DIR})
+endif()
+if (NOT DEFINED ENV{PICOTOOL_DIR})
+        message("PICOTOOL: set PICOTOOL_DIR env variable if you create uf2 output with pico_add_extra_outputs()")
+else()
+        message("PICOTOOL: PICOTOOL_DIR env variable is set to '$ENV{PICOTOOL_DIR}'")
+        set(picotool_DIR $ENV{PICOTOOL_DIR})
+endif()
+
+if (DEFINED ENV{PICO_PLATFORM})
+        message("PICO_PLATFORM: PICO_PLATFORM env variable is set to '$ENV{PICO_PLATFORM}'")
+        set(PICO_PLATFORM $ENV{PICO_PLATFORM} CACHE STRING "Pico Platform")
+else()
+        message("PICO_PLATFORM: PICO_PLATFORM env variable is not set. Using default")
+endif()
+
+if (DEFINED ENV{PICO_BOARD})
+        message("PICO_BOARD: PICO_BOARD env variable is set to '$ENV{PICO_BOARD}'")
+        set(PICO_BOARD $ENV{PICO_BOARD} CACHE STRING "Board type")
+else()
+        message("PICO_BOARD: PICO_BOARD env variable is not set. Using default")
+endif()
 
 # Pull in SDK (must be before project)
 include(pico_sdk_import.cmake)
 
 project(pico_scpi_usbtmc_labtool C CXX ASM)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "  Diag: maximum debug info")
