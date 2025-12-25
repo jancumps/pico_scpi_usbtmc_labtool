@@ -241,7 +241,7 @@ SECTIONS
     } > SCRATCH_X
     .stack_dummy (COPY):
     {
-        KEEP(*(.stack*))*(.stack*))
+        KEEP(*(.stack*))
     } > SCRATCH_Y
 
     .flash_end : {
