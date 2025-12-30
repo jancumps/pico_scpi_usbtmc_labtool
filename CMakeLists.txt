@@ -98,7 +98,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC pico_stdlib
         hardware_pwm hardware_i2c pico_unique_id
         pico_scpi_usbtmc_lablib)
 
-pico_set_linker_script(${CMAKE_PROJECT_NAME} ${CMAKE_SOURCE_DIR}/memmap_custom.ld)
+# TODO: custom script doesn't work with RP2350 (risc) and picotool - find a way to reserve 4K for persistent data
+# pico_set_linker_script(${CMAKE_PROJECT_NAME} ${CMAKE_SOURCE_DIR}/memmap_custom.ld)
 
 pico_add_extra_outputs(${CMAKE_PROJECT_NAME})
 
