@@ -109,3 +109,12 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE SCPI_USER_CONFIG=1)
 # usb output, uart output
  pico_enable_stdio_usb(${CMAKE_PROJECT_NAME} 0)
  pico_enable_stdio_uart(${CMAKE_PROJECT_NAME} 0)
+
+# set the USB IDs for this device
+target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+        USB_VID=0xCafe
+        USB_PID=0x4000
+        USB_MANUFACTURER=0x01
+        USB_PRODUCT=0x02
+        USB_SERIALNUMBER=0x03
+)
