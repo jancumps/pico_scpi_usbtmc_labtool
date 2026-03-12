@@ -113,7 +113,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE SCPI_USER_CONFIG=1)
 # set the USB IDs for this device
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         USB_VID=0xCafe
-        USB_BCD=0x0200
+        USB_PID=0x4000
         USB_MANUFACTURER=0x01
         USB_PRODUCT=0x02
         USB_SERIALNUMBER=0x03
