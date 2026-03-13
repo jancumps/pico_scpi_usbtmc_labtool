@@ -111,6 +111,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE SCPI_USER_CONFIG=1)
  pico_enable_stdio_uart(${CMAKE_PROJECT_NAME} 0)
 
 # set the USB IDs for this device
+# https://pid.codes/ might be able to provide you with an ID
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         USB_VID=0xCafe
         USB_PID=0x4000
