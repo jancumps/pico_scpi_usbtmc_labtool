@@ -50,16 +50,6 @@ endif ()
 
 pico_sdk_init()
 
-# include(FetchContent)
-# FetchContent_Declare(
-#         pico_scpi_usbtmc_lablib
-#         GIT_REPOSITORY https://github.com/jancumps/pico_scpi_usbtmc_lablib.git
-#         GIT_TAG master
-#         GIT_SUBMODULES_RECURSE FALSE
-# )
-# message("Downloading PICO SCPI USBTMC Lab Lib")
-# FetchContent_Populate(pico_scpi_usbtmc_lablib)
-
 pico_add_subdirectory(pico_scpi_usbtmc_lablib)
 
 add_compile_options(-Wall
@@ -67,8 +57,6 @@ add_compile_options(-Wall
         -Wno-unused-function 
         -Wno-maybe-uninitialized
         )
-
-
 
 add_executable(${CMAKE_PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/source/main.c
@@ -107,8 +95,8 @@ pico_add_extra_outputs(${CMAKE_PROJECT_NAME})
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE SCPI_USER_CONFIG=1)
 
 # usb output, uart output
- pico_enable_stdio_usb(${CMAKE_PROJECT_NAME} 0)
- pico_enable_stdio_uart(${CMAKE_PROJECT_NAME} 0)
+pico_enable_stdio_usb(${CMAKE_PROJECT_NAME} 0)
+pico_enable_stdio_uart(${CMAKE_PROJECT_NAME} 0)
 
 # set the USB IDs for this device
 # https://pid.codes/ might be able to provide you with an ID
