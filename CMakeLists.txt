@@ -117,4 +117,6 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         USB_MANUFACTURER=0x01
         USB_PRODUCT=0x02
         USB_SERIALNUMBER=0x03
+        FW_VER_BCD=0x0100
+        FW_VER_STR="01.00"
 )
